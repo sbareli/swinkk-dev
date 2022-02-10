@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1059031035345",
+    "project_id": "swinkk-dev-phase-1",
+    "storage_bucket": "swinkk-dev-phase-1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059031035345:android:1054d599a439f8fb3084f0",
+        "android_client_info": {
+          "package_name": "com.swinkk.swiftlink"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1059031035345-2ppo0o9ngbirgnsqcrkp6p5h2f5ohsmt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.swinkk.swiftlink",
+            "certificate_hash": "a6af7a7ceb047d345d4faacd75cea382a4633a1c"
+          }
+        },
+        {
+          "client_id": "1059031035345-ohq9ih3841ibcqan0m3varnkkcbr4msv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7GnteSTq5yZd-STs-lSyoUtm2gdvR3XY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1059031035345-ohq9ih3841ibcqan0m3varnkkcbr4msv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Swinkk</string>
+    <string name="facebook_app_id">287826946671226</string>
+    <string name="fb_login_protocol_scheme">fb287826946671226</string>
+    <string name="facebook_client_token">84e1aaab6a4fb2ebe3bc71dfb390654b</string>
+</resources>
