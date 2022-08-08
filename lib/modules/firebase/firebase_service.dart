@@ -55,7 +55,7 @@ class FirebaseServices extends BaseFirebaseServices {
     try {
       await auth!.signInWithEmailAndPassword(email: email, password: password);
       return auth!.currentUser;
-      // await FirebaseFirestore.instance.collection('users').doc(user.user!.uid).set({
+      // await FirebaseFirestore.instance.collection('User').doc(user.user!.uid).set({
       //   'name': email,
       //   'email': email
       // });
@@ -76,7 +76,7 @@ class FirebaseServices extends BaseFirebaseServices {
   @override
   void saveUserToFirestore({user}) async {
     var usr = auth!.currentUser;
-    await FirebaseServices().firestore!.collection('users').doc(usr!.uid).set(
+    await FirebaseServices().firestore!.collection('User').doc(usr!.uid).set(
       {
         'email': usr.email,
         'phonenumber': usr.phoneNumber,
@@ -167,12 +167,12 @@ class FirebaseServices extends BaseFirebaseServices {
   bool get isEmailVerfied => FirebaseServices().auth?.currentUser?.emailVerified ?? false;
 
   Future<DocumentSnapshot> userExistInDB() async {
-    var userDoc = await FirebaseServices().firestore!.collection('users').doc(auth!.currentUser!.uid).get();
+    var userDoc = await FirebaseServices().firestore!.collection('User').doc(auth!.currentUser!.uid).get();
     return userDoc;
   }
 
   Future updateUserLastLogin() async {
-    return await FirebaseServices().firestore!.collection('users').doc(auth!.currentUser!.uid).update({
+    return await FirebaseServices().firestore!.collection('User').doc(auth!.currentUser!.uid).update({
       'last_login': DateTime.now(),
     });
   }

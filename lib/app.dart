@@ -51,7 +51,7 @@ class AppState extends State<App> with WidgetsBindingObserver implements UserMod
   void initState() {
     printLog('[AppState] initState');
     _app = AppModel(widget.languageCode);
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     appInitialModules();
 

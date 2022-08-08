@@ -105,7 +105,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   const SizedBox(height: 20),
                   SizedBox(
                     // width: 400,
-                    height: 400,
+                    height: 402,
                     child: Form(
                       key: _formKey,
                       child: Column(

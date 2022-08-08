@@ -5,7 +5,7 @@ abstract class BaseScreen<T extends StatefulWidget> extends State<T> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) => afterFirstLayout(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) => afterFirstLayout(context));
   }
 
   void afterFirstLayout(BuildContext context) {}

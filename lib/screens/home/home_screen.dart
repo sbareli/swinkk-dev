@@ -11,6 +11,8 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text('this is home screen'),
             Text('Username: ${user!.username}'),
@@ -19,7 +21,7 @@ class HomeScreen extends StatelessWidget {
             Text('Email: ${user.email}'),
           ],
         ),
-      ),
+      ),  
     );
   }
 }
