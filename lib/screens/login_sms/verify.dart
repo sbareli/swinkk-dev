@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 
 import '../../common/constants.dart';
 import '../../generated/l10n.dart';
@@ -195,17 +195,17 @@ class _VerifyCodeState extends State<VerifyCode> {
   Future<void> _signInWithCredential(credential) async {
     final user = await Services().firebase.loginFirebaseCredential(credential: credential);
     if (user != null) {
-      await Provider.of<UserModel>(context, listen: false).loginFirebaseSMS(
-        phoneNumber: user.phoneNumber!.replaceAll('+', ''),
-        success: () {
-          // _stopAnimation();
-          _welcomeMessage(context);
-        },
-        fail: (message) {
-          // _stopAnimation();
-          _failMessage(message, context);
-        },
-      );
+      // await Provider.of<UserModel>(context, listen: false).loginFirebaseSMS(
+      //   phoneNumber: user.phoneNumber!.replaceAll('+', ''),
+      //   success: () {
+      //     // _stopAnimation();
+      //     _welcomeMessage(context);
+      //   },
+      //   fail: (message) {
+      //     // _stopAnimation();
+      //     _failMessage(message, context);
+      //   },
+      // );
     } else {
       // await _stopAnimation();
       _failMessage(S.of(context).codeEnteredIsNotCorrect, context);

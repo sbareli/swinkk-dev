@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 import 'package:swiftlink/generated/l10n.dart';
 import 'package:swiftlink/models/index.dart';
 import 'package:swiftlink/modules/firebase/firebase_service.dart';
@@ -33,7 +32,7 @@ class _OnboardingScreenFirstState extends State<OnboardingScreenFirst> {
   void initState() {
     super.initState();
     user = FirebaseServices().userExistInDB();
-    checkLocationPermissions();
+    // checkLocationPermissions();
   }
 
   @override
@@ -76,31 +75,31 @@ class _OnboardingScreenFirstState extends State<OnboardingScreenFirst> {
     }
   }
 
-  void checkLocationPermissions() async {
-    try {
-      if (await Geolocator.checkPermission() == LocationPermission.whileInUse || await Geolocator.checkPermission() == LocationPermission.always) {
-        position();
-      } else {
-        var newPermission = await Geolocator.requestPermission();
-        if (newPermission == LocationPermission.whileInUse || newPermission == LocationPermission.always) {
-          setState(() {
-            position();
-          });
-        } else {}
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
+  // void checkLocationPermissions() async {
+  //   try {
+  //     if (await Geolocator.checkPermission() == LocationPermission.whileInUse || await Geolocator.checkPermission() == LocationPermission.always) {
+  //       position();
+  //     } else {
+  //       var newPermission = await Geolocator.requestPermission();
+  //       if (newPermission == LocationPermission.whileInUse || newPermission == LocationPermission.always) {
+  //         setState(() {
+  //           position();
+  //         });
+  //       } else {}
+  //     }
+  //   } catch (e) {
+  //     debugPrint(e.toString());
+  //   }
+  // }
 
-  void position() {
-    Geolocator.getCurrentPosition().then((position) {
-      setState(() {});
-      if (!mounted) {
-        return;
-      }
-    });
-  }
+  // void position() {
+  //   Geolocator.getCurrentPosition().then((position) {
+  //     setState(() {});
+  //     if (!mounted) {
+  //       return;
+  //     }
+  //   });
+  // }
 
   // _locationDialog() {
   //   return Dialog(
@@ -133,7 +132,7 @@ class _OnboardingScreenFirstState extends State<OnboardingScreenFirst> {
   @override
   Widget build(BuildContext context) {
     gotoHomeScreen(user) {
-      Provider.of<UserModel>(context, listen: false).saveUser(User.fromJson(user));
+      // Provider.of<UserModel>(context, listen: false).saveUser(User.fromJson(user));
       FirebaseServices().updateUserLastLogin();
       return const HomeScreen();
     }
@@ -269,7 +268,7 @@ class _OnboardingScreenFirstState extends State<OnboardingScreenFirst> {
                                         location: location.text.trim(),
                                       );
                                       FirebaseServices().saveUserToFirestore(user: user);
-                                      Provider.of<UserModel>(context, listen: false).saveUser(user);
+                                      // Provider.of<UserModel>(context, listen: false).saveUser(user);
                                       Navigator.of(context).push(MaterialPageRoute(
                                         builder: (context) => const PreferenceScreen(),
                                       ));

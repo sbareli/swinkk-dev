@@ -1,11 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:swiftlink/app.dart';
 import 'package:swiftlink/common/utils/logs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swiftlink/modules/firebase/firebase_service.dart';
 import 'package:the_apple_sign_in/the_apple_sign_in.dart' as apple;
-
 import '../common/constants.dart';
 import '../generated/l10n.dart';
 import '../services/index.dart';
@@ -52,8 +54,6 @@ class UserModel with ChangeNotifier {
 
             await storeLoginStatus();
             success!();
-
-            notifyListeners();
           }
           break;
 
@@ -74,8 +74,6 @@ class UserModel with ChangeNotifier {
     try {
       await storeLoginStatus();
       success();
-
-      notifyListeners();
     } catch (err) {
       fail!(S.of(context).loginErrorServiceProvider(err.toString()));
     }
@@ -101,7 +99,6 @@ class UserModel with ChangeNotifier {
           fail!(result.message);
           break;
       }
-      notifyListeners();
     } catch (err) {
       fail!(S.of(context).loginErrorServiceProvider(err.toString()));
     }
@@ -114,6 +111,9 @@ class UserModel with ChangeNotifier {
       ]);
       var res = await _googleSignIn.signIn();
 
+      var googleUser = User(username: res?.displayName.toString(), firstName: res?.displayName.toString(), lastName: res?.displayName.toString(), location: '');
+      FirebaseServices().saveUserToFirestore(user: googleUser);
+
       if (res == null) {
         fail!(S.of(context).loginCanceled);
       } else {
@@ -121,7 +121,6 @@ class UserModel with ChangeNotifier {
         await Services().firebase.loginFirebaseGoogle(token: auth.accessToken);
         await storeLoginStatus();
         success!();
-        notifyListeners();
       }
     } catch (err, trace) {
       printLog(trace);
@@ -148,7 +147,6 @@ class UserModel with ChangeNotifier {
         user = User.fromLocalJson(json);
         loggedIn = true;
         delegate?.onLoaded(user);
-        notifyListeners();
       }
     } catch (err) {
       printLog(err);
@@ -167,18 +165,16 @@ class UserModel with ChangeNotifier {
   }) async {
     try {
       loading = true;
-      notifyListeners();
+
       await Services().firebase.createUserWithEmailAndPassword(email: username!, password: password!);
 
       await storeLoginStatus();
       success();
 
       loading = false;
-      notifyListeners();
     } catch (err) {
       fail!(err.toString());
       loading = false;
-      notifyListeners();
     }
   }
 
@@ -205,7 +201,7 @@ class UserModel with ChangeNotifier {
   //   } catch (err) {
   //     printLog(err);
   //   }
-  //   notifyListeners();
+  //
   // }
 
   Future<void> login({
@@ -216,24 +212,22 @@ class UserModel with ChangeNotifier {
   }) async {
     try {
       loading = true;
-      notifyListeners();
       var usr = await Services().firebase.loginFirebaseEmail(email: username, password: password);
 
       await storeLoginStatus();
       success();
       loading = false;
-      notifyListeners();
     } catch (err) {
       loading = false;
       fail(err.toString());
-      notifyListeners();
     }
   }
 
   storeLoginStatus() async {
-    loggedIn = true;
-    // save to Preference
-    var prefs = injector<SharedPreferences>();
-    await prefs.setBool('loggedIn', true);
+    dataStorage.write('isLogging', true);
+    // loggedIn = true;
+    // // save to Preference
+    // var prefs = injector<SharedPreferences>();
+    // await prefs.setBool('loggedIn', true);
   }
 }

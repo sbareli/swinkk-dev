@@ -4,7 +4,7 @@ import 'package:swiftlink/common/constants.dart';
 import 'package:swiftlink/common/theme/theme.dart';
 import 'package:swiftlink/common/utils/string_extensions.dart';
 import 'package:swiftlink/generated/l10n.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 
 import '../../models/index.dart' show UserModel;
 
@@ -185,12 +185,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           TextButton(
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                await Provider.of<UserModel>(context, listen: false).createUser(
-                                  username: username.text.trim(),
-                                  password: password.text.trim(),
-                                  success: () => Navigator.of(context).pushNamed(RouteList.verifyEmail),
-                                  fail: _snackBar,
-                                );
+                                // await Provider.of<UserModel>(context, listen: false).createUser(
+                                //   username: username.text.trim(),
+                                //   password: password.text.trim(),
+                                //   success: () => Navigator.of(context).pushNamed(RouteList.verifyEmail),
+                                //   fail: _snackBar,
+                                // );
                               }
                             },
                             // onPressed: () =>

@@ -38,7 +38,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   cloud_firestore: 
   firebase_auth:
-  provider:
+  firebase_core: ^1.11.0
+  firebase_messaging: ^11.4.1
+  # provider:
   google_sign_in:
   flutter_facebook_auth:
   http:
@@ -52,9 +54,9 @@ dependencies:
   flutter_spinkit:
   hexagon: ^0.2.0-nullsafety.1
   flutter_typeahead:
-  geolocator: ^9.0.1
   flutter_google_places: ^0.3.0
-  # google_maps_flutter: ^2.1.1
+  get: ^4.6.5
+  get_storage: ^2.0.3
   
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -167,6 +168,7 @@ class FirebaseServices extends BaseFirebaseServices {
   bool get isEmailVerfied => FirebaseServices().auth?.currentUser?.emailVerified ?? false;
 
   Future<DocumentSnapshot> userExistInDB() async {
+    log(auth!.currentUser!.uid.toString());
     var userDoc = await FirebaseServices().firestore!.collection('User').doc(auth!.currentUser!.uid).get();
     return userDoc;
   }
