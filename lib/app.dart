@@ -1,28 +1,18 @@
-import 'export.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:swiftlink/common/theme/theme.dart';
+import 'package:swiftlink/controller/language_change_controller/language_messages.dart';
+import 'package:swiftlink/screens/splash_screen/splash_screen.dart';
 
-class SwinkkDevApp extends StatefulWidget {
+class SwinkkDevApp extends StatelessWidget {
   const SwinkkDevApp({Key? key}) : super(key: key);
 
   @override
-  State<SwinkkDevApp> createState() => _SwinkkDevAppState();
-}
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(debugLabel: "navigator");
-final dataStorage = GetStorage();
-
-class _SwinkkDevAppState extends State<SwinkkDevApp> {
-  @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      navigatorKey: navigatorKey,
       locale: const Locale('en'),
       fallbackLocale: const Locale('en'),
       translations: LanguageMessages(),
-      initialRoute: '/',
-      getPages: [
-        GetPage(name: '/', page: () => const SplashScreen()),
-        GetPage(name: '/onboarding', page: () => const OnboardingScreenFirst())
-      ],
       debugShowCheckedModeBanner: false,
       theme: Constants.lightTheme,
       darkTheme: Constants.darkTheme,

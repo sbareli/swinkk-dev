@@ -25,7 +25,7 @@ class _LoginSMSState extends State<LoginSMSScreen> {
   @override
   void initState() {
     super.initState();
-    _verifySuccessStream = Services().firebase.getFirebaseStream();
+    // _verifySuccessStream = Services().firebase.getFirebaseStream();
 
     _phone = '';
 
@@ -93,13 +93,13 @@ class _LoginSMSState extends State<LoginSMSScreen> {
         _failMessage(exception.message, context);
       }
 
-      Services().firebase.verifyPhoneNumber(
-            phoneNumber: phoneNumber!,
-            codeAutoRetrievalTimeout: autoRetrieve,
-            codeSent: smsCodeSent,
-            verificationCompleted: verifiedSuccess,
-            verificationFailed: verifyFailed,
-          );
+      // Services().firebase.verifyPhoneNumber(
+      //       phoneNumber: phoneNumber!,
+      //       codeAutoRetrievalTimeout: autoRetrieve,
+      //       codeSent: smsCodeSent,
+      //       verificationCompleted: verifiedSuccess,
+      //       verificationFailed: verifyFailed,
+      //     );
     }
   }
 

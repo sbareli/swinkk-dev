@@ -1,90 +1,43 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:swiftlink/common/constants.dart';
+import 'package:get/get.dart';
+import 'package:swiftlink/common/constants/app_asset.dart';
 import 'package:swiftlink/common/theme/theme.dart';
-import 'package:swiftlink/common/utils/string_extensions.dart';
-import 'package:swiftlink/generated/l10n.dart';
-// import 'package:provider/provider.dart';
+import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen.dart';
+import 'package:swiftlink/screens/login_sms/verify.dart';
+import 'package:swiftlink/services/validators.dart';
 
-import '../../models/index.dart' show UserModel;
-
-class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({Key? key}) : super(key: key);
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
-  _RegistrationScreenState createState() => _RegistrationScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> {
-  final username = TextEditingController();
-  final password = TextEditingController();
-  final confirmPassword = TextEditingController();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-    // _tabController = TabController(length: 2, vsync: this);
-  }
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController username = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final TextEditingController confirmPassword = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    username.dispose();
-    password.dispose();
-    confirmPassword.dispose();
+    username.clear();
+    password.clear();
+    confirmPassword.clear();
     super.dispose();
-  }
-
-  String? _emailValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Cannot be empty';
-    }
-    if (value.contains('@') && !value.isValidEmailFormat) {
-      return 'Not a valid email address';
-    }
-  }
-
-  String? _passwordValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Cannot be empty';
-    }
-  }
-
-  String? _confirmPasswordValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Cannot be empty';
-    }
-    if (value != password.text) {
-      return 'Passwords do not match';
-    }
-  }
-
-  void _snackBar(String text) {
-    if (mounted) {
-      final snackBar = SnackBar(
-        content: Text(text),
-        duration: const Duration(seconds: 10),
-        action: SnackBarAction(
-          label: S.of(context).close,
-          onPressed: () {
-            // Some code to undo the change.
-          },
-        ),
-      );
-      // ignore: deprecated_member_use
-      _scaffoldKey.currentState!.showSnackBar(snackBar);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       body: SingleChildScrollView(
         child: Container(
           decoration: const BoxDecoration(
-            image: DecorationImage(image: AssetImage('assets/images/Register1n2.png'), fit: BoxFit.cover),
+            image: DecorationImage(
+              image: AssetImage(AppAsset.registerOneAndTwo),
+              fit: BoxFit.cover,
+            ),
           ),
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
@@ -94,8 +47,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Image.asset(
-                    'assets/images/WelcometoSwinkk.png',
-                    scale: 2,
+                    AppAsset.appLogo,
                   ),
                   const SizedBox(height: 30),
                   Text(
@@ -104,76 +56,62 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
-                    // width: 400,
-                    height: 402,
+                    height: 415,
                     child: Form(
                       key: _formKey,
                       child: Column(
                         children: [
                           TextFormField(
-                            keyboardType: TextInputType.emailAddress,
                             controller: username,
-                            validator: _emailValidator,
-                            // onChanged: (value) {
-                            //   email = value;
-                            // },
+                            validator: (String? value) => Validators.validateEmail(value),
                             decoration: InputDecoration(
-                              hintText: S.of(context).emailAddress,
+                              hintText: 'Email address',
                               helperText: '',
                               isDense: true,
                               prefixIcon: Align(
-                                widthFactor: 1.0,
-                                heightFactor: 1.0,
+                                widthFactor: 2.5,
+                                heightFactor: 1,
                                 child: Image.asset(
-                                  'assets/images/envelopIcon.png',
+                                  AppAsset.email,
                                   scale: 2,
                                 ),
                               ),
                             ),
                           ),
-                          // const SizedBox(
-                          //   height: 4,
-                          // ),
                           TextFormField(
                             obscureText: true,
                             controller: password,
-                            validator: _passwordValidator,
-                            // onChanged: (value) {
-                            //   password = value;
-                            // },
+                            validator: (String? value) => Validators.validatePassword(value),
                             decoration: InputDecoration(
-                              hintText: S.of(context).password,
+                              hintText: 'Password',
                               helperText: '',
                               isDense: true,
                               prefixIcon: Align(
                                 widthFactor: 3.2,
                                 heightFactor: 1,
                                 child: Image.asset(
-                                  'assets/images/lockIcon.png',
+                                  AppAsset.lockIcon,
                                   scale: 2,
                                 ),
                               ),
                             ),
                           ),
-                          // const SizedBox(
-                          //   height: 4,
-                          // ),
                           TextFormField(
                             obscureText: true,
                             controller: confirmPassword,
-                            validator: _confirmPasswordValidator,
-                            // onChanged: (value) {
-                            //   password = value;
-                            // },
+                            validator: (String? value) => Validators.validateConfirmPassword(
+                              value,
+                              password: password.text,
+                            ),
                             decoration: InputDecoration(
-                              hintText: S.of(context).confirmPassword,
+                              hintText: 'Confirm Password',
                               helperText: '',
                               isDense: true,
                               prefixIcon: Align(
                                 widthFactor: 3.2,
                                 heightFactor: 1,
                                 child: Image.asset(
-                                  'assets/images/lockIcon.png',
+                                  AppAsset.lockIcon,
                                   scale: 2,
                                 ),
                               ),
@@ -185,6 +123,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           TextButton(
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
+                                Get.to(
+                                  () => VerifyCode(),
+                                );
                                 // await Provider.of<UserModel>(context, listen: false).createUser(
                                 //   username: username.text.trim(),
                                 //   password: password.text.trim(),
@@ -200,19 +141,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             style: TextButton.styleFrom(
                               minimumSize: const Size.fromHeight(50),
                             ),
-                            child: Text(S.of(context).next),
+                            child: const Text('Next'),
                           ),
                           const SizedBox(
                             height: 20,
                           ),
                           Text.rich(
                             TextSpan(
-                              text: '${S.of(context).alreadyHaveAnAccount} ',
+                              text: 'Already have an account? ',
                               children: [
                                 TextSpan(
-                                  text: S.of(context).signIn,
+                                  text: 'Sign In',
                                   style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
-                                  recognizer: TapGestureRecognizer()..onTap = () => Navigator.of(context).popUntil((route) => route.settings.name == RouteList.login),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Get.to(
+                                        () => SignInScreen(),
+                                      );
+                                    },
                                 ),
                               ],
                             ),

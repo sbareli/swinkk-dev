@@ -1,29 +1,25 @@
 class BaseFirebaseServices {
-  Future<void> init() async {}
+  static void loginFirebaseApple({authorizationCode, identityToken}) {}
 
-  void loginFirebaseApple({authorizationCode, identityToken}) {}
+  static void loginFirebaseFacebook({token}) {}
 
-  void loginFirebaseFacebook({token}) {}
+  static void loginFirebaseGoogle({token}) {}
 
-  void loginFirebaseGoogle({token}) {}
+  static void loginFirebaseEmail({email, password}) {}
 
-  void loginFirebaseEmail({email, password}) {}
+  static void loginFirebaseCredential({credential}) {}
 
-  dynamic loginFirebaseCredential({credential}) {}
+  static void getFirebaseCredential({verificationId, smsCode}) {}
 
-  dynamic getFirebaseCredential({verificationId, smsCode}) {}
+  static void saveUserToFirestore({user}) {}
 
-  /// save user to firebase
-  void saveUserToFirestore({user}) {}
+  static void getFirebaseStream() {}
 
-  /// verify SMS login
-  dynamic getFirebaseStream() {}
+  static void verifyPhoneNumber({phoneNumber, codeAutoRetrievalTimeout, codeSent, verificationCompleted, verificationFailed}) {}
 
-  void verifyPhoneNumber({phoneNumber, codeAutoRetrievalTimeout, codeSent, verificationCompleted, verificationFailed}) {}
+  static void createUserWithEmailAndPassword({email, password}) {}
 
-  void createUserWithEmailAndPassword({email, password}) {}
+  static void sendPasswordResetEmail({email}) {}
 
-  void sendPasswordResetEmail({email}) {}
-
-  void signOut() {}
+  static void signOut() {}
 }

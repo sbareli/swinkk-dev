@@ -1,16 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:localstorage/localstorage.dart';
-import 'package:swiftlink/app.dart';
 import 'package:swiftlink/common/utils/logs.dart';
 import 'package:swiftlink/modules/firebase/firebase_service.dart';
+import 'package:swiftlink/services/services.dart';
 import 'package:the_apple_sign_in/the_apple_sign_in.dart' as apple;
-import '../common/constants.dart';
 import '../generated/l10n.dart';
-import '../services/index.dart';
 import 'entities/user.dart';
 
 abstract class UserModelDelegate {
@@ -23,10 +19,8 @@ abstract class UserModelDelegate {
 
 class UserModel with ChangeNotifier {
   UserModel() {
-    getUser();
+    // getUser();
   }
-
-  final _storage = injector<LocalStorage>();
 
   // final Services _service = Services();
   User? user;
@@ -47,10 +41,10 @@ class UserModel with ChangeNotifier {
       switch (result.status) {
         case apple.AuthorizationStatus.authorized:
           {
-            await Services().firebase.loginFirebaseApple(
-                  authorizationCode: result.credential!.authorizationCode!,
-                  identityToken: result.credential!.identityToken!,
-                );
+            // await Services().firebase.loginFirebaseApple(
+            //       authorizationCode: result.credential!.authorizationCode!,
+            //       identityToken: result.credential!.identityToken!,
+            //     );
 
             await storeLoginStatus();
             success!();
@@ -87,7 +81,7 @@ class UserModel with ChangeNotifier {
         case LoginStatus.success:
           final accessToken = await FacebookAuth.instance.accessToken;
 
-          await Services().firebase.loginFirebaseFacebook(token: accessToken!.token);
+          // await Services().firebase.loginFirebaseFacebook(token: accessToken!.token);
 
           await storeLoginStatus();
           success!();
@@ -118,7 +112,7 @@ class UserModel with ChangeNotifier {
         fail!(S.of(context).loginCanceled);
       } else {
         var auth = await res.authentication;
-        await Services().firebase.loginFirebaseGoogle(token: auth.accessToken);
+        // await Services().firebase.loginFirebaseGoogle(token: auth.accessToken);
         await storeLoginStatus();
         success!();
       }
@@ -133,25 +127,25 @@ class UserModel with ChangeNotifier {
     try {
       // save the user Info as local storage
       this.user = user;
-      await _storage.setItem(kLocalKey['userInfo']!, user);
+      // await _storage.setItem(kLocalKey['userInfo']!, user);
       delegate?.onLoaded(user);
     } catch (err) {
       printLog(err);
     }
   }
 
-  Future<void> getUser() async {
-    try {
-      final json = _storage.getItem(kLocalKey['userInfo']!);
-      if (json != null) {
-        user = User.fromLocalJson(json);
-        loggedIn = true;
-        delegate?.onLoaded(user);
-      }
-    } catch (err) {
-      printLog(err);
-    }
-  }
+  // Future<void> getUser() async {
+  //   try {
+  //     final json = _storage.getItem(kLocalKey['userInfo']!);
+  //     if (json != null) {
+  //       user = User.fromLocalJson(json);
+  //       loggedIn = true;
+  //       delegate?.onLoaded(user);
+  //     }
+  //   } catch (err) {
+  //     printLog(err);
+  //   }
+  // }
 
   Future<void> createUser({
     String? username,
@@ -166,7 +160,7 @@ class UserModel with ChangeNotifier {
     try {
       loading = true;
 
-      await Services().firebase.createUserWithEmailAndPassword(email: username!, password: password!);
+      // await Services().firebase.createUserWithEmailAndPassword(email: username!, password: password!);
 
       await storeLoginStatus();
       success();
@@ -212,7 +206,7 @@ class UserModel with ChangeNotifier {
   }) async {
     try {
       loading = true;
-      var usr = await Services().firebase.loginFirebaseEmail(email: username, password: password);
+      // var usr = await Services().firebase.loginFirebaseEmail(email: username, password: password);
 
       await storeLoginStatus();
       success();
@@ -224,7 +218,7 @@ class UserModel with ChangeNotifier {
   }
 
   storeLoginStatus() async {
-    dataStorage.write('isLogging', true);
+    GetStorage().write('isLogging', true);
     // loggedIn = true;
     // // save to Preference
     // var prefs = injector<SharedPreferences>();

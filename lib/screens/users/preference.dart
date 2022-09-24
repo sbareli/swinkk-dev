@@ -4,7 +4,7 @@ import 'package:hexagon/hexagon.dart';
 import 'package:swiftlink/common/theme/theme.dart';
 import 'package:swiftlink/generated/l10n.dart';
 import 'package:swiftlink/screens/home/home_screen.dart';
-import 'package:swiftlink/services/index.dart';
+import 'package:swiftlink/services/services.dart';
 
 class PreferenceScreen extends StatefulWidget {
   const PreferenceScreen({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   @override
   void initState() {
     super.initState();
-    servicesList = Services().firebase.getServices();
+    // servicesList = Services().firebase.getServices();
   }
 
   @override
@@ -107,7 +107,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Services().firebase.saveUserPreferences(selectedServices);
+                          // Services().firebase.saveUserPreferences(selectedServices);
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const HomeScreen(),
                           ));

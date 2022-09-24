@@ -1,12 +1,12 @@
-import '../modules/firebase/firebase_service.dart';
-import 'service_config.dart';
+// import '../modules/firebase/firebase_service.dart';
+// import 'service_config.dart';
 
-class Services with ConfigMixin {
-  static final Services _instance = Services._internal();
+// class Services with ConfigMixin {
+//   static final Services _instance = Services._internal();
 
-  factory Services() => _instance;
+//   factory Services() => _instance;
 
-  Services._internal();
+//   Services._internal();
 
-  final firebase = FirebaseServices();
-}
+//   final firebase = FirebaseServices();
+// }

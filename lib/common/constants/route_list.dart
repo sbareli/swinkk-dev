@@ -1,6 +1,3 @@
-part of '../constants.dart';
-
-/// route list constant
 class RouteList {
   // // Home
   static const String home = '/home';

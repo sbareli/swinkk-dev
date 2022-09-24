@@ -93,55 +93,31 @@
 //   }
 // }
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:swiftlink/app.dart';
+import 'package:swiftlink/common/constants/app_asset.dart';
 import 'package:swiftlink/common/theme/theme.dart';
-import 'package:swiftlink/models/user_model.dart';
 import 'package:get/get.dart';
-import 'package:swiftlink/screens/home/home_screen.dart';
-import 'package:swiftlink/screens/users/login_screen.dart';
+import 'package:swiftlink/screens/splash_screen/splash_screen_controller.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  // final userModel = UserModel();
-
-  @override
-  void initState() {
-    startTime();
-    super.initState();
-  }
-
-  startTime() async {
-    return Timer(
-        const Duration(seconds: 3),
-        () => Get.offAll(() => dataStorage.read('isLogging') == true
-            ? LoginScreen()
-            : LoginScreen(
-                // login: userModel.login,
-                // loginFB: userModel.loginFB,
-                // loginApple: userModel.loginApple,
-                // loginGoogle: userModel.loginGoogle,
-                )));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Constants.blue,
-        body: Center(
-          child: Image.asset(
-            "assets/images/Swinkk.png",
-            gaplessPlayback: true,
-            fit: BoxFit.contain,
+    return GetBuilder<SplashScreenController>(
+      init: SplashScreenController(),
+      initState: (_) {},
+      builder: (_) {
+        return Scaffold(
+          body: Center(
+            child: Image.asset(
+              AppAsset.appLogo,
+              gaplessPlayback: true,
+              fit: BoxFit.contain,
+            ),
           ),
-        ));
+        );
+      },
+    );
   }
 }

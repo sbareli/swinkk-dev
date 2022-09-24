@@ -1,203 +1,214 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:swiftlink/common/utils/app_asset.dart';
-import 'package:swiftlink/controller/login_screen_controller.dart';
-import 'package:swiftlink/screens/users/forgot_password_screen.dart';
-import 'package:swiftlink/export.dart';
-import 'package:swiftlink/services/firebase_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:swiftlink/common/theme/theme.dart';
+import 'package:swiftlink/common/constants/app_asset.dart';
+import 'package:swiftlink/screens/authentication/forgot_password/forgot_password_screen_bindings.dart';
+import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen_controller.dart';
+import 'package:swiftlink/screens/authentication/sign_up/sign_up_screen.dart';
+import 'package:swiftlink/screens/authentication/sign_up/sign_up_screen_bindings.dart';
+import 'package:swiftlink/screens/authentication/forgot_password/forgot_password_screen.dart';
+import 'package:swiftlink/services/validators.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class SignInScreen extends GetView<SigninScreenController> {
+  SignInScreen({Key? key}) : super(key: key);
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController userNameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<LoginScreenController>(
-      init: LoginScreenController(),
-      builder: (controller) => Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(AppAsset.signin),
-                fit: BoxFit.cover,
-              ),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(AppAsset.signInBackground),
+              fit: BoxFit.cover,
             ),
-            child: AutofillGroup(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Form(
-                    key: controller.formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        TextFormField(
-                          keyboardType: TextInputType.emailAddress,
-                          controller: controller.userNameController,
-                          // validator: _emailValidator,
-                          decoration: InputDecoration(
-                            hintText: 'emailAddress'.tr,
-                            helperText: '',
-                            isDense: true,
-                            prefixIcon: Align(
-                              widthFactor: 1.0,
-                              heightFactor: 1.0,
-                              child: Image.asset(
-                                AppAsset.email,
-                                scale: 2,
-                              ),
+          ),
+          child: AutofillGroup(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        controller: userNameController,
+                        validator: (String? value) => Validators.validateEmail(value),
+                        decoration: InputDecoration(
+                          hintText: 'emailAddress'.tr,
+                          helperText: '',
+                          isDense: true,
+                          prefixIcon: Align(
+                            widthFactor: 1.0,
+                            heightFactor: 1.0,
+                            child: Image.asset(
+                              AppAsset.email,
+                              scale: 2,
                             ),
                           ),
                         ),
-                        TextFormField(
-                          obscureText: !controller.isPasswordVisible,
-                          controller: controller.passwordController,
-                          // validator: _passwordValidator,
-                          decoration: InputDecoration(
-                            hintText: 'password'.tr,
-                            helperText: '',
-                            isDense: true,
-                            prefixIcon: Align(
-                              widthFactor: 3.2,
-                              heightFactor: 1,
-                              child: Image.asset(
-                                AppAsset.lock,
-                                scale: 2,
-                              ),
-                            ),
-                            suffixIcon: InkWell(
-                              onTap: () {
-                                controller.isPasswordVisible = !controller.isPasswordVisible;
-                                controller.update();
-                              },
-                              child: !controller.isPasswordVisible
-                                  ? Image.asset(
-                                      AppAsset.eyeOff,
-                                      scale: 2,
-                                    )
-                                  : Icon(
-                                      Icons.remove_red_eye_outlined,
-                                      size: 25,
-                                      color: Colors.grey.shade400,
-                                    ),
+                      ),
+                      TextFormField(
+                        obscureText: !controller.isPasswordVisible,
+                        controller: passwordController,
+                        validator: (String? value) => value == null || value.isEmpty ? 'Password is required' : null,
+                        decoration: InputDecoration(
+                          hintText: 'password'.tr,
+                          helperText: '',
+                          isDense: true,
+                          prefixIcon: Align(
+                            widthFactor: 3.2,
+                            heightFactor: 1,
+                            child: Image.asset(
+                              AppAsset.lockIcon,
+                              scale: 2,
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
+                          suffixIcon: InkWell(
                             onTap: () {
-                              Get.to(() => const ForgotPasswordScreen());
+                              controller.isPasswordVisible = !controller.isPasswordVisible;
+                              controller.update();
                             },
-                            behavior: HitTestBehavior.opaque,
+                            child: !controller.isPasswordVisible
+                                ? Image.asset(
+                                    AppAsset.eyeOffIcon,
+                                    scale: 2,
+                                  )
+                                : Icon(
+                                    Icons.remove_red_eye_outlined,
+                                    size: 25,
+                                    color: Colors.grey.shade400,
+                                  ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.to(
+                              () => ForgotPasswordScreen(),
+                              binding: ForgotPasswordScreenBinding(),
+                            );
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Text(
+                            'forgotPassword'.tr,
+                            style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: Get.height * 0.03),
+                      TextButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            controller.login(userNameController.text, passwordController.text);
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        child: Text('continueText'.tr),
+                      ),
+                      SizedBox(height: Get.height * 0.01),
+                      Text(
+                        'or'.tr,
+                        style: TextStyle(color: Constants.grey03),
+                      ),
+                      SizedBox(height: Get.height * 0.02),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          if (controller.isAvailableApple)
+                            InkWell(
+                              // onTap: () => _loginApple(context),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(40),
+                                  color: Colors.black87,
+                                ),
+                                child: Image.asset(
+                                  AppAsset.apple,
+                                  width: 26,
+                                  height: 26,
+                                ),
+                              ),
+                            ),
+                          InkWell(
+                            onTap: () => controller.loginWithFacebook(),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                color: const Color(0xFF4267B2),
+                              ),
+                              child: const Icon(
+                                Icons.facebook_rounded,
+                                color: Colors.white,
+                                size: 34.0,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => controller.signInWithGoogle(),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                color: Colors.grey.shade300,
+                              ),
+                              child: Image.asset(
+                                AppAsset.google,
+                                width: 28,
+                                height: 28,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => controller.submitPhoneNumber('+918306667760'),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                color: Colors.lightBlue.shade50,
+                              ),
+                              child: Image.asset(
+                                AppAsset.sms,
+                                width: 28,
+                                height: 28,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: Get.height * 0.03),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text('dontHaveAnAccount'.tr),
+                          GestureDetector(
+                            onTap: () {
+                              Get.to(
+                                () => const SignUpScreen(),
+                                binding: SignUpScreenBinding(),
+                              );
+                              // Navigator.of(context).pushNamed(RouteList.register);
+                            },
                             child: Text(
-                              'forgotPassword'.tr,
+                              ' signUp'.tr,
                               style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
                             ),
                           ),
-                        ),
-                        SizedBox(height: Get.height * 0.03),
-                        TextButton(
-                          onPressed: () async {
-                            if (controller.formKey.currentState!.validate()) {
-                              controller.login();
-                            }
-                          },
-                          style: TextButton.styleFrom(
-                            minimumSize: const Size.fromHeight(50),
-                          ),
-                          child: Text('continueText'.tr),
-                        ),
-                        SizedBox(height: Get.height * 0.01),
-                        Text(
-                          'or'.tr,
-                          style: TextStyle(color: Constants.grey03),
-                        ),
-                        SizedBox(height: Get.height * 0.02),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            if (controller.isAvailableApple)
-                              InkWell(
-                                // onTap: () => _loginApple(context),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                    color: Colors.black87,
-                                  ),
-                                  child: Image.asset(
-                                    AppAsset.apple,
-                                    width: 26,
-                                    height: 26,
-                                  ),
-                                ),
-                              ),
-                            InkWell(
-                              onTap: () => controller.loginWithFacebook(),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  color: const Color(0xFF4267B2),
-                                ),
-                                child: const Icon(
-                                  Icons.facebook_rounded,
-                                  color: Colors.white,
-                                  size: 34.0,
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () => controller.signInWithGoogle(),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  color: Colors.grey.shade300,
-                                ),
-                                child: Image.asset(
-                                  AppAsset.gooogle,
-                                  width: 28,
-                                  height: 28,
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () => controller.submitPhoneNumber('+918306667760'),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  color: Colors.lightBlue.shade50,
-                                ),
-                                child: Image.asset(
-                                  AppAsset.sms,
-                                  width: 28,
-                                  height: 28,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: Get.height * 0.03),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text('dontHaveAnAccount'.tr),
-                            GestureDetector(
-                              onTap: () {
-                                // Navigator.of(context).pushNamed(RouteList.register);
-                              },
-                              child: Text(
-                                ' signUp'.tr,
-                                style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: Get.height * 0.01),
-                      ],
-                    ),
+                        ],
+                      ),
+                      SizedBox(height: Get.height * 0.01),
+                    ],
                   ),
                 ),
               ),

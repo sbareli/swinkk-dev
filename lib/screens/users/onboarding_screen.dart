@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 // import 'package:provider/provider.dart';
 import 'package:swiftlink/generated/l10n.dart';
-import 'package:swiftlink/models/index.dart';
 import 'package:swiftlink/modules/firebase/firebase_service.dart';
 import 'package:swiftlink/screens/home/home_screen.dart';
 import 'package:swiftlink/screens/users/preference.dart';
@@ -31,7 +30,7 @@ class _OnboardingScreenFirstState extends State<OnboardingScreenFirst> {
   @override
   void initState() {
     super.initState();
-    user = FirebaseServices().userExistInDB();
+    // user = FirebaseServices().userExistInDB();
     // checkLocationPermissions();
   }
 
@@ -261,12 +260,12 @@ class _OnboardingScreenFirstState extends State<OnboardingScreenFirst> {
                                 TextButton(
                                   onPressed: () {
                                     if (formKey.currentState?.validate() == true) {
-                                      var user = User(
-                                        username: username.text.trim(),
-                                        firstName: firstname.text.trim(),
-                                        lastName: lastname.text.trim(),
-                                        location: location.text.trim(),
-                                      );
+                                      // var user = User(
+                                      //   username: username.text.trim(),
+                                      //   firstName: firstname.text.trim(),
+                                      //   lastName: lastname.text.trim(),
+                                      //   location: location.text.trim(),
+                                      // );
                                       FirebaseServices().saveUserToFirestore(user: user);
                                       // Provider.of<UserModel>(context, listen: false).saveUser(user);
                                       Navigator.of(context).push(MaterialPageRoute(

@@ -3,12 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:swiftlink/common/constants/route_list.dart';
 // import 'package:provider/provider.dart';
 
-import '../../common/constants.dart';
 import '../../generated/l10n.dart';
-import '../../models/index.dart';
-import '../../services/services.dart';
 
 class VerifyCode extends StatefulWidget {
   final String? phoneNumber;
@@ -52,7 +51,7 @@ class _VerifyCodeState extends State<VerifyCode> {
 
     onTapRecognizer = TapGestureRecognizer()
       ..onTap = () {
-        Navigator.pop(context);
+        Get.back();
       };
   }
 
@@ -109,12 +108,12 @@ class _VerifyCodeState extends State<VerifyCode> {
         _failMessage('code cannot be empty', context);
         return;
       }
-      final credential = Services().firebase.getFirebaseCredential(
-            verificationId: widget.verId!,
-            smsCode: smsCode,
-          );
+      // final credential = Services().firebase.getFirebaseCredential(
+      //       verificationId: widget.verId!,
+      //       smsCode: smsCode,
+      //     );
 
-      await _signInWithCredential(credential);
+      // await _signInWithCredential(credential);
     } catch (e) {
       _failMessage(e.toString(), context);
     }
@@ -193,22 +192,22 @@ class _VerifyCodeState extends State<VerifyCode> {
   }
 
   Future<void> _signInWithCredential(credential) async {
-    final user = await Services().firebase.loginFirebaseCredential(credential: credential);
-    if (user != null) {
-      // await Provider.of<UserModel>(context, listen: false).loginFirebaseSMS(
-      //   phoneNumber: user.phoneNumber!.replaceAll('+', ''),
-      //   success: () {
-      //     // _stopAnimation();
-      //     _welcomeMessage(context);
-      //   },
-      //   fail: (message) {
-      //     // _stopAnimation();
-      //     _failMessage(message, context);
-      //   },
-      // );
-    } else {
-      // await _stopAnimation();
-      _failMessage(S.of(context).codeEnteredIsNotCorrect, context);
-    }
+    // final user = await Services().firebase.loginFirebaseCredential(credential: credential);
+    // if (user != null) {
+    // await Provider.of<UserModel>(context, listen: false).loginFirebaseSMS(
+    //   phoneNumber: user.phoneNumber!.replaceAll('+', ''),
+    //   success: () {
+    //     // _stopAnimation();
+    //     _welcomeMessage(context);
+    //   },
+    //   fail: (message) {
+    //     // _stopAnimation();
+    //     _failMessage(message, context);
+    //   },
+    // );
+    // } else {
+    // await _stopAnimation();
+    //   _failMessage(S.of(context).codeEnteredIsNotCorrect, context);
+    // }
   }
 }

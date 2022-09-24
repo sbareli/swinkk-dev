@@ -1,16 +1,15 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:swiftlink/export.dart';
-
-import '../models/entities/user.dart';
+import 'package:swiftlink/models/entities/user.dart';
+import 'package:swiftlink/services/firebase_helper.dart';
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
-class LoginScreenController extends GetxController {
-  final formKey = GlobalKey<FormState>();
-  TextEditingController userNameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+class SigninScreenController extends GetxController {
   bool isPasswordVisible = false;
   bool isAvailableApple = false;
   bool isActiveAudio = false;
@@ -18,8 +17,8 @@ class LoginScreenController extends GetxController {
   User? user;
   dynamic respose;
 
-  login() async {
-    respose = await FireStoreUtils.loginWithEmailAndPassword(userNameController.text, passwordController.text);
+  login(userName, password) async {
+    respose = await FireStoreUtils.loginWithEmailAndPassword(userName, password);
   }
 
   loginWithFacebook() async {
@@ -29,7 +28,7 @@ class LoginScreenController extends GetxController {
         log(result.toString());
       }
     } catch (e, s) {
-      print('_LoginScreen.loginWithFacebook $e $s');
+      debugPrint('_LoginScreen.loginWithFacebook $e $s');
     }
   }
 
@@ -90,7 +89,7 @@ class LoginScreenController extends GetxController {
     await auth.FirebaseAuth.instance.signInWithCredential(credential).whenComplete(() async => {
           userdata = auth.FirebaseAuth.instance.currentUser,
           log(userdata.toString()),
-          dataStorage.write("Uid", userdata!.uid),
+          GetStorage().write("Uid", userdata!.uid),
           // firestore.collection("users").doc(userdata!.uid).set({
           //   "uid": user!.uid,
           //   "name": user!.displayName,
