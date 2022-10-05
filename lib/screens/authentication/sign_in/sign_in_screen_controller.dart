@@ -5,23 +5,31 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:swiftlink/models/entities/user.dart';
+import 'package:swiftlink/services/base_firebase_services.dart';
 import 'package:swiftlink/services/firebase_helper.dart';
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class SigninScreenController extends GetxController {
-  bool isPasswordVisible = false;
-  bool isAvailableApple = false;
-  bool isActiveAudio = false;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController userNameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  RxBool isPasswordVisible = false.obs;
+  RxBool isAvailableApple = false.obs;
+  RxBool isActiveAudio = false.obs;
   auth.User? userdata;
   User? user;
   dynamic respose;
 
-  login(userName, password) async {
-    respose = await FireStoreUtils.loginWithEmailAndPassword(userName, password);
+  void passwordVisible() {
+    isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  loginWithFacebook() async {
+  Future<void> login(userName, password) async {
+    respose = await FireStoreUtils.loginWithEmailAndPassword(email: userName, password: password);
+  }
+
+  Future<void> loginWithFacebook() async {
     try {
       dynamic result = await FireStoreUtils.loginWithFacebook();
       if (result != null && result is User) {
@@ -55,26 +63,12 @@ class SigninScreenController extends GetxController {
       },
       (auth.PhoneAuthCredential credential) async {
         auth.UserCredential userCredential = await auth.FirebaseAuth.instance.signInWithCredential(credential);
-        User? user = await FireStoreUtils.getCurrentUser(userCredential.user?.uid ?? '');
+        User? user = await BaseFirebaseServices.getCurrentUser(
+          userId: userCredential.user?.uid ?? '',
+        );
         if (user != null) {
           log(user.toString());
-        } else {
-          /// create a new user from phone login
-          String profileImageUrl = '';
-          // if (_image != null) {
-          //   profileImageUrl = await FireStoreUtils.uploadUserImageToFireStorage(_image!, userCredential.user?.uid ?? '');
-          // }
-          // User user = User(firstName: _firstNameController.text, lastName: _lastNameController.text, fcmToken: await FireStoreUtils.firebaseMessaging.getToken() ?? '', phoneNumber: phoneNumber, active: true, role: USER_ROLE_CUSTOMER, lastOnlineTimestamp: Timestamp.now(), settings: UserSettings(), email: '', profilePictureURL: profileImageUrl, userID: userCredential.user?.uid ?? '');
-          // String? errorMessage = await FireStoreUtils.firebaseCreateNewUser(user);
-          // hideProgress();
-          // if (errorMessage == null) {
-          //   MyAppState.currentUser = user;
-          //   pushAndRemoveUntil(context, ContainerScreen(user: user), false);
-          // } else {
-          //   showAlertDialog(context, 'Failed'.tr(), 'Couldn\'t create new user with phone number.'.tr(), true);
-          // }
-        }
-        // }
+        } else {}
       },
     );
   }

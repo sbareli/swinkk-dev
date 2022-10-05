@@ -95,7 +95,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:swiftlink/common/constants/app_asset.dart';
-import 'package:swiftlink/common/theme/theme.dart';
 import 'package:get/get.dart';
 import 'package:swiftlink/screens/splash_screen/splash_screen_controller.dart';
 

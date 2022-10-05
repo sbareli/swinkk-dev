@@ -10,10 +10,7 @@ import 'package:swiftlink/screens/authentication/forgot_password/forgot_password
 import 'package:swiftlink/services/validators.dart';
 
 class SignInScreen extends GetView<SigninScreenController> {
-  SignInScreen({Key? key}) : super(key: key);
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController userNameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  const SignInScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,17 +24,17 @@ class SignInScreen extends GetView<SigninScreenController> {
           ),
           child: AutofillGroup(
             child: SizedBox(
-              height: MediaQuery.of(context).size.height,
+              height: Get.height,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Form(
-                  key: formKey,
+                  key: controller.formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       TextFormField(
                         keyboardType: TextInputType.emailAddress,
-                        controller: userNameController,
+                        controller: controller.userNameController,
                         validator: (String? value) => Validators.validateEmail(value),
                         decoration: InputDecoration(
                           hintText: 'emailAddress'.tr,
@@ -53,37 +50,38 @@ class SignInScreen extends GetView<SigninScreenController> {
                           ),
                         ),
                       ),
-                      TextFormField(
-                        obscureText: !controller.isPasswordVisible,
-                        controller: passwordController,
-                        validator: (String? value) => value == null || value.isEmpty ? 'Password is required' : null,
-                        decoration: InputDecoration(
-                          hintText: 'password'.tr,
-                          helperText: '',
-                          isDense: true,
-                          prefixIcon: Align(
-                            widthFactor: 3.2,
-                            heightFactor: 1,
-                            child: Image.asset(
-                              AppAsset.lockIcon,
-                              scale: 2,
+                      Obx(
+                        () => TextFormField(
+                          obscureText: !controller.isPasswordVisible.value,
+                          controller: controller.passwordController,
+                          validator: (String? value) => value == null || value.isEmpty ? 'Password is required' : null,
+                          decoration: InputDecoration(
+                            hintText: 'password'.tr,
+                            helperText: '',
+                            isDense: true,
+                            prefixIcon: Align(
+                              widthFactor: 3.2,
+                              heightFactor: 1,
+                              child: Image.asset(
+                                AppAsset.lockIcon,
+                                scale: 2,
+                              ),
                             ),
-                          ),
-                          suffixIcon: InkWell(
-                            onTap: () {
-                              controller.isPasswordVisible = !controller.isPasswordVisible;
-                              controller.update();
-                            },
-                            child: !controller.isPasswordVisible
-                                ? Image.asset(
-                                    AppAsset.eyeOffIcon,
-                                    scale: 2,
-                                  )
-                                : Icon(
-                                    Icons.remove_red_eye_outlined,
-                                    size: 25,
-                                    color: Colors.grey.shade400,
-                                  ),
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                controller.passwordVisible();
+                              },
+                              child: !controller.isPasswordVisible.value
+                                  ? Image.asset(
+                                      AppAsset.eyeOffIcon,
+                                      scale: 2,
+                                    )
+                                  : Icon(
+                                      Icons.remove_red_eye_outlined,
+                                      size: 25,
+                                      color: Colors.grey.shade400,
+                                    ),
+                            ),
                           ),
                         ),
                       ),
@@ -106,8 +104,8 @@ class SignInScreen extends GetView<SigninScreenController> {
                       SizedBox(height: Get.height * 0.03),
                       TextButton(
                         onPressed: () async {
-                          if (formKey.currentState!.validate()) {
-                            controller.login(userNameController.text, passwordController.text);
+                          if (controller.formKey.currentState!.validate()) {
+                            controller.login(controller.userNameController.text, controller.passwordController.text);
                           }
                         },
                         style: TextButton.styleFrom(
@@ -124,7 +122,7 @@ class SignInScreen extends GetView<SigninScreenController> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: <Widget>[
-                          if (controller.isAvailableApple)
+                          if (controller.isAvailableApple.value)
                             InkWell(
                               // onTap: () => _loginApple(context),
                               child: Container(

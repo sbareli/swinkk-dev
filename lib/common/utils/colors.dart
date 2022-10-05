@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 Map<String, Color> colorStyles = {
   'primary': Colors.blue,
@@ -14,7 +13,9 @@ const Color whiteColor = Color(0xffFFFFFF);
 const Color blackColor = Color(0xff000000);
 const Color textfieldcolor = Color(0xff468AFF);
 
-const Color backgroundGrey = Color(0xffECEFF3);
+const Color backgroundGrey = Color(0xffEEF0F2);
+const Color textGrey = Color(0xffA3AFBB);
+const Color textBlack = Color(0xff495057);
 const Color lightGrey = Color(0xffF4F4F5);
 const Color hintGrey = Color(0xffBABABA);
 const Color contentGrey = Color(0xff969498);

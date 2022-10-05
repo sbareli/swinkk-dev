@@ -22,7 +22,7 @@ void printLog([dynamic data, DateTime? startTime]) {
 
     try {
       final now = DateFormat('h:mm:ss-ms').format(DateTime.now());
-      print('ℹ️[${now}ms]$time${data.toString()}');
+      debugPrint('ℹ️[${now}ms]$time${data.toString()}');
 
       if (data.toString().contains('is not a subtype of type')) {
         throw Exception();

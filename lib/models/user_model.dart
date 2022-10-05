@@ -4,7 +4,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:swiftlink/common/utils/logs.dart';
 import 'package:swiftlink/modules/firebase/firebase_service.dart';
-import 'package:swiftlink/services/services.dart';
 import 'package:the_apple_sign_in/the_apple_sign_in.dart' as apple;
 import '../generated/l10n.dart';
 import 'entities/user.dart';
@@ -79,7 +78,7 @@ class UserModel with ChangeNotifier {
       final result = await FacebookAuth.instance.login();
       switch (result.status) {
         case LoginStatus.success:
-          final accessToken = await FacebookAuth.instance.accessToken;
+          // AccessToken? accessToken = await FacebookAuth.instance.accessToken;
 
           // await Services().firebase.loginFirebaseFacebook(token: accessToken!.token);
 
@@ -105,13 +104,17 @@ class UserModel with ChangeNotifier {
       ]);
       var res = await _googleSignIn.signIn();
 
-      var googleUser = User(username: res?.displayName.toString(), firstName: res?.displayName.toString(), lastName: res?.displayName.toString(), location: '');
+      var googleUser = User(
+        userName: res?.displayName.toString(),
+        firstName: res?.displayName.toString(),
+        lastName: res?.displayName.toString(),
+      );
       FirebaseServices().saveUserToFirestore(user: googleUser);
 
       if (res == null) {
         fail!(S.of(context).loginCanceled);
       } else {
-        var auth = await res.authentication;
+        // var auth = await res.authentication;
         // await Services().firebase.loginFirebaseGoogle(token: auth.accessToken);
         await storeLoginStatus();
         success!();

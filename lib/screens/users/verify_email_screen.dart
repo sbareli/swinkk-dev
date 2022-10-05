@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:swiftlink/common/utils/logs.dart';
 import 'package:swiftlink/generated/l10n.dart';
 import 'package:swiftlink/modules/firebase/firebase_service.dart';
-import 'package:swiftlink/screens/users/onboarding_screen.dart';
+
+import '../authentication/registration/registration_screen.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   const VerifyEmailScreen({Key? key}) : super(key: key);
@@ -61,7 +62,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   @override
   Widget build(BuildContext context) {
     return isEmailVerified
-        ? const OnboardingScreenFirst()
+        ? const RegistrationScreen()
         : Scaffold(
             body: SingleChildScrollView(
               child: Container(
@@ -104,7 +105,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                           style: TextButton.styleFrom(
                             minimumSize: const Size.fromHeight(50),
                           ),
-                          child: Text('Resend Email'),
+                          child: const Text('Resend Email'),
                         ),
                         const SizedBox(
                           height: 50,

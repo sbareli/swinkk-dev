@@ -13,7 +13,6 @@ class FirebaseServices extends BaseFirebaseServices {
   factory FirebaseServices() => _instance;
   FirebaseServices._internal();
 
-  @override
   Future<void> init() async {
     await Firebase.initializeApp();
     _auth = FirebaseAuth.instance;
@@ -30,7 +29,6 @@ class FirebaseServices extends BaseFirebaseServices {
 
   FirebaseFirestore? get firestore => _firestore;
 
-  @override
   Future loginFirebaseApple({authorizationCode, identityToken}) async {
     final AuthCredential credential = OAuthProvider('apple.com').credential(
       accessToken: String.fromCharCodes(authorizationCode),
@@ -39,19 +37,16 @@ class FirebaseServices extends BaseFirebaseServices {
     await FirebaseServices().auth!.signInWithCredential(credential);
   }
 
-  @override
   Future loginFirebaseFacebook({token}) async {
     AuthCredential credential = FacebookAuthProvider.credential(token);
     await FirebaseServices().auth!.signInWithCredential(credential);
   }
 
-  @override
   Future loginFirebaseGoogle({token}) async {
     AuthCredential credential = GoogleAuthProvider.credential(accessToken: token);
     await FirebaseServices().auth!.signInWithCredential(credential);
   }
 
-  @override
   Future loginFirebaseEmail({email, password}) async {
     try {
       await auth!.signInWithEmailAndPassword(email: email, password: password);
@@ -69,19 +64,17 @@ class FirebaseServices extends BaseFirebaseServices {
     }
   }
 
-  @override
   Future<User?>? loginFirebaseCredential({credential}) async {
     return (await FirebaseServices().auth!.signInWithCredential(credential)).user;
   }
 
-  @override
   void saveUserToFirestore({user}) async {
     var usr = auth!.currentUser;
     await FirebaseServices().firestore!.collection('User').doc(usr!.uid).set(
       {
         'email': usr.email,
         'phonenumber': usr.phoneNumber,
-        'username': user.username,
+        'username': user.userName,
         'firstname': user.firstName,
         'lastname': user.lastName,
         'first_login': DateTime.now(),
@@ -112,7 +105,6 @@ class FirebaseServices extends BaseFirebaseServices {
     );
   }
 
-  @override
   PhoneAuthCredential getFirebaseCredential({verificationId, smsCode}) {
     return PhoneAuthProvider.credential(
       verificationId: verificationId,
@@ -120,12 +112,10 @@ class FirebaseServices extends BaseFirebaseServices {
     );
   }
 
-  @override
   StreamController<PhoneAuthCredential> getFirebaseStream() {
     return StreamController<PhoneAuthCredential>.broadcast();
   }
 
-  @override
   void verifyPhoneNumber({phoneNumber, codeAutoRetrievalTimeout, codeSent, verificationCompleted, verificationFailed}) async {
     await FirebaseServices().auth!.verifyPhoneNumber(
           phoneNumber: phoneNumber!,
@@ -137,7 +127,6 @@ class FirebaseServices extends BaseFirebaseServices {
         );
   }
 
-  @override
   Future createUserWithEmailAndPassword({email, password}) async {
     // if (isEnabled) {
     try {
@@ -151,7 +140,6 @@ class FirebaseServices extends BaseFirebaseServices {
     // }
   }
 
-  @override
   void sendPasswordResetEmail({email}) {
     try {
       FirebaseServices().auth?.sendPasswordResetEmail(email: email);
@@ -160,7 +148,6 @@ class FirebaseServices extends BaseFirebaseServices {
     }
   }
 
-  @override
   void signOut() async {
     await FirebaseServices().auth?.signOut();
   }

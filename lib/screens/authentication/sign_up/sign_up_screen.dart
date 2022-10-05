@@ -4,29 +4,11 @@ import 'package:get/get.dart';
 import 'package:swiftlink/common/constants/app_asset.dart';
 import 'package:swiftlink/common/theme/theme.dart';
 import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen.dart';
-import 'package:swiftlink/screens/login_sms/verify.dart';
+import 'package:swiftlink/screens/authentication/sign_up/sign_up_screen_controller.dart';
 import 'package:swiftlink/services/validators.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignUpScreen extends GetView<SignUpScreenController> {
   const SignUpScreen({Key? key}) : super(key: key);
-
-  @override
-  _SignUpScreenState createState() => _SignUpScreenState();
-}
-
-class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController username = TextEditingController();
-  final TextEditingController password = TextEditingController();
-  final TextEditingController confirmPassword = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  @override
-  void dispose() {
-    username.clear();
-    password.clear();
-    confirmPassword.clear();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,86 +40,74 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(
                     height: 415,
                     child: Form(
-                      key: _formKey,
+                      key: controller.formKey,
                       child: Column(
                         children: [
                           TextFormField(
-                            controller: username,
-                            validator: (String? value) => Validators.validateEmail(value),
-                            decoration: InputDecoration(
-                              hintText: 'Email address',
+                            controller: controller.phoneNumber,
+                            validator: (String? value) => Validators.validatePhoneNumber(value),
+                            decoration: const InputDecoration(
+                              hintText: 'Mobile Number',
                               helperText: '',
                               isDense: true,
                               prefixIcon: Align(
-                                widthFactor: 2.5,
-                                heightFactor: 1,
-                                child: Image.asset(
-                                  AppAsset.email,
-                                  scale: 2,
-                                ),
-                              ),
+                                  widthFactor: 2.5,
+                                  heightFactor: 1,
+                                  child: Icon(
+                                    Icons.phone,
+                                    size: 20,
+                                    color: Color(0xffFB9A08),
+                                  )),
                             ),
                           ),
-                          TextFormField(
-                            obscureText: true,
-                            controller: password,
-                            validator: (String? value) => Validators.validatePassword(value),
-                            decoration: InputDecoration(
-                              hintText: 'Password',
-                              helperText: '',
-                              isDense: true,
-                              prefixIcon: Align(
-                                widthFactor: 3.2,
-                                heightFactor: 1,
-                                child: Image.asset(
-                                  AppAsset.lockIcon,
-                                  scale: 2,
-                                ),
-                              ),
-                            ),
-                          ),
-                          TextFormField(
-                            obscureText: true,
-                            controller: confirmPassword,
-                            validator: (String? value) => Validators.validateConfirmPassword(
-                              value,
-                              password: password.text,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Confirm Password',
-                              helperText: '',
-                              isDense: true,
-                              prefixIcon: Align(
-                                widthFactor: 3.2,
-                                heightFactor: 1,
-                                child: Image.asset(
-                                  AppAsset.lockIcon,
-                                  scale: 2,
-                                ),
-                              ),
-                            ),
-                          ),
+                          // TextFormField(
+                          //   obscureText: true,
+                          //   controller: controller.password,
+                          //   validator: (String? value) => Validators.validatePassword(value),
+                          //   decoration: InputDecoration(
+                          //     hintText: 'Password',
+                          //     helperText: '',
+                          //     isDense: true,
+                          //     prefixIcon: Align(
+                          //       widthFactor: 3.2,
+                          //       heightFactor: 1,
+                          //       child: Image.asset(
+                          //         AppAsset.lockIcon,
+                          //         scale: 2,
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                          // TextFormField(
+                          //   obscureText: true,
+                          //   controller: controller.confirmPassword,
+                          //   validator: (String? value) => Validators.validateConfirmPassword(
+                          //     value,
+                          //     password: controller.password.text,
+                          //   ),
+                          //   decoration: InputDecoration(
+                          //     hintText: 'Confirm Password',
+                          //     helperText: '',
+                          //     isDense: true,
+                          //     prefixIcon: Align(
+                          //       widthFactor: 3.2,
+                          //       heightFactor: 1,
+                          //       child: Image.asset(
+                          //         AppAsset.lockIcon,
+                          //         scale: 2,
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                           const SizedBox(
                             height: 40,
                           ),
                           TextButton(
                             onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                Get.to(
-                                  () => VerifyCode(),
-                                );
-                                // await Provider.of<UserModel>(context, listen: false).createUser(
-                                //   username: username.text.trim(),
-                                //   password: password.text.trim(),
-                                //   success: () => Navigator.of(context).pushNamed(RouteList.verifyEmail),
-                                //   fail: _snackBar,
-                                // );
+                              if (controller.formKey.currentState!.validate()) {
+                                controller.signupWithMobileNumber();
                               }
                             },
-                            // onPressed: () =>
-                            //     Navigator.of(context).push(MaterialPageRoute(
-                            //   builder: (context) => const RegisterThird(),
-                            // )),
                             style: TextButton.styleFrom(
                               minimumSize: const Size.fromHeight(50),
                             ),
@@ -156,7 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
                                       Get.to(
-                                        () => SignInScreen(),
+                                        () => const SignInScreen(),
                                       );
                                     },
                                 ),

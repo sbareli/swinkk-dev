@@ -1,25 +1,149 @@
+import 'package:get/get.dart';
+import 'package:swiftlink/models/entities/user.dart';
+import 'package:swiftlink/models/service.dart';
+import 'package:swiftlink/models/user_contact.dart';
+import 'package:swiftlink/models/user_prefrence.dart';
+import 'package:swiftlink/services/firebase_helper.dart';
+
 class BaseFirebaseServices {
-  static void loginFirebaseApple({authorizationCode, identityToken}) {}
+  static Future<Map<String, dynamic>?> firebaseSubmitPhoneNumberCode({
+    required String code,
+    required String phoneNumber,
+  }) async {
+    Map<String, dynamic> response = await FireStoreUtils.firebaseSubmitPhoneNumberCode(
+      code: code,
+      phoneNumber: phoneNumber,
+    );
+    return checkAuthResponse(response);
+  }
 
-  static void loginFirebaseFacebook({token}) {}
+  static Future<bool?> checkIfUserNameAvailable({
+    required String userName,
+  }) async {
+    Map<String, dynamic> response = await FireStoreUtils.checkIfUserNameAvailable(
+      userName,
+    );
+    return checkResponse(response);
+  }
 
-  static void loginFirebaseGoogle({token}) {}
+  static Future<User?> createNewUser({required User user}) async {
+    Map<String, dynamic> response = await FireStoreUtils.createNewAccount(
+      user,
+    );
+    return checkAuthResponse(response);
+  }
 
-  static void loginFirebaseEmail({email, password}) {}
+  static Future<UserContact?> userContact({
+    required UserContact userContact,
+    required String userId,
+  }) async {
+    Map<String, dynamic> response = await FireStoreUtils.addUserContact(
+      userContact,
+      userId,
+    );
+    return checkResponse(response);
+  }
 
-  static void loginFirebaseCredential({credential}) {}
+  static Future<User?> getCurrentUser({required String userId}) async {
+    Map<String, dynamic> response = await FireStoreUtils.getCurrentUser(
+      userId,
+    );
+    return checkAuthResponse(response);
+  }
 
-  static void getFirebaseCredential({verificationId, smsCode}) {}
+  static Future<List<ServiceModel>> getService() async {
+    Map<String, dynamic> response = await FireStoreUtils.getService();
+    return checkResponse(response);
+  }
 
-  static void saveUserToFirestore({user}) {}
+  static Future<UserPrefrence>? setServiceList(UserPrefrence userPrefrence, String userId) async {
+    Map<String, dynamic> response = await FireStoreUtils.setServiceList(userPrefrence, userId);
+    return checkResponse(response);
+  }
 
-  static void getFirebaseStream() {}
+  static Future<bool>? isServiceAdded(String userName) async {
+    Map<String, dynamic> response = await FireStoreUtils.ifServiceAdded(userName);
+    return checkResponse(response);
+  }
 
-  static void verifyPhoneNumber({phoneNumber, codeAutoRetrievalTimeout, codeSent, verificationCompleted, verificationFailed}) {}
+  static Future<User?> loginFirebaseEmail({
+    required String email,
+    required String password,
+  }) async {
+    Map<String, dynamic> response = await FireStoreUtils.loginWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return checkResponse(response);
+  }
 
-  static void createUserWithEmailAndPassword({email, password}) {}
+  static checkResponse(Map<String, dynamic> response) {
+    if (response['errorMessgae'] == null) {
+      if (response['successMessage'] != null) {
+        showSuccess(
+          title: 'Success',
+          sucessMessage: response['successMessage'],
+        );
+      }
+      return response['data'];
+    } else {
+      showError(
+        title: 'Error',
+        errorMessage: response['errorMessgae'],
+      );
+      return null;
+    }
+  }
 
-  static void sendPasswordResetEmail({email}) {}
+  static checkAuthResponse(Map<String, dynamic> response) {
+    if (response['data'] != null || response['successMessage'] != null) {
+      if (response['successMessage'] != null) {
+        showSuccess(
+          title: 'Success',
+          sucessMessage: response['successMessage'],
+        );
+      }
+      return response['data'];
+    } else {
+      showError(
+        title: 'Error',
+        errorMessage: getErrorMessgae(
+          response['errorMessage'],
+        ),
+      );
+      return null;
+    }
+  }
 
-  static void signOut() {}
+  static String getErrorMessgae(String exceptionCode) {
+    switch (exceptionCode) {
+      case 'invalid-email':
+        return 'Email address is malformed.';
+      case 'invalid-verification-code':
+        return 'Invalid verification code';
+      case 'wrong-password':
+        return 'Wrong password.';
+      case 'user-not-found':
+        return 'No user corresponding to the given email address.';
+      case 'user-disabled':
+        return 'This user has been disabled.';
+      case 'too-many-requests':
+        return 'Too many attempts to sign in as this user.';
+    }
+    return 'Unexpected firebase error, Please try again.';
+  }
+
+  static void showError({
+    required String title,
+    required String errorMessage,
+  }) {
+    Get.snackbar(title, errorMessage);
+  }
+
+  static void showSuccess({
+    required String title,
+    required String sucessMessage,
+  }) {
+    Get.snackbar(title, sucessMessage);
+  }
 }

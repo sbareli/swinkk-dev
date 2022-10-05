@@ -25,12 +25,12 @@ class Validators {
   }
 
   static String? validatePhoneNumber(String? value, {String? message}) {
-    String pattern = r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$';
-    RegExp regExp = RegExp(pattern);
+    // String pattern = r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$';
+    // RegExp regExp = RegExp(pattern);
     if (value == null || value.isEmpty) {
       return message ?? 'Phone number is required';
-    } else if (!regExp.hasMatch(value)) {
-      return message ?? 'Invalid phone number';
+    } else if (value.length < 11) {
+      return 'Please enter mobile number with country code ex. +91';
     } else {
       return null;
     }
