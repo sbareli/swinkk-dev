@@ -1,9 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:swiftlink/models/entities/user.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:swiftlink/common/constants/local_storage_key.dart';
+import 'package:swiftlink/models/user_model.dart';
 import 'package:swiftlink/screens/authentication/registration/registration_screen.dart';
 import 'package:swiftlink/screens/authentication/registration/registration_screen_binding.dart';
+import 'package:swiftlink/screens/preference/preference.dart';
+import 'package:swiftlink/screens/preference/preference_screen_binding.dart';
 import 'package:swiftlink/services/base_firebase_services.dart';
 
 class OtpVerifyScreenController extends GetxController {
@@ -13,7 +17,7 @@ class OtpVerifyScreenController extends GetxController {
   });
 
   RxBool isLoading = false.obs;
-
+  GetStorage getStorage = GetStorage();
   final TextEditingController codeController = TextEditingController();
   RxBool hasError = false.obs;
   RxString currentText = ''.obs;
@@ -32,6 +36,19 @@ class OtpVerifyScreenController extends GetxController {
           () => const RegistrationScreen(),
           binding: RegistrationScreenBinding(
             user: user,
+          ),
+        );
+      } else if (responseCode['statusCode'] == '300') {
+        User currentUser = responseCode['user'];
+        getStorage.write(LocalStorageKey.currentUser, currentUser);
+        getStorage.write(LocalStorageKey.currentUserUid, currentUser.id);
+        getStorage.write(LocalStorageKey.currentUserUsereName, currentUser.userName);
+        getStorage.write(LocalStorageKey.isLogging, true);
+
+        Get.to(
+          () => const PreferenceScreen(),
+          binding: PreferenceScreenBindings(
+            user: currentUser,
           ),
         );
       }

@@ -11,15 +11,15 @@ class UserContact {
 
   UserContact.fromJson(Map<String, dynamic> json) {
     optAddressOne = json['optAddressOne'];
-    systemId = json['systemId'];
-    userName = json['userName'];
+    systemId = json['system_id'];
+    userName = json['user_name'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['optAddressOne'] = optAddressOne;
-    data['systemId'] = systemId;
-    data['userName'] = userName;
+    data['system_id'] = systemId;
+    data['user_name'] = userName;
     return data;
   }
 }

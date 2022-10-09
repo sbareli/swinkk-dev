@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:swiftlink/common/constants/local_storage_key.dart';
-import 'package:swiftlink/models/entities/user.dart';
+import 'package:swiftlink/models/user_model.dart';
 import 'package:swiftlink/models/user_contact.dart';
 import 'package:swiftlink/screens/preference/preference.dart';
 import 'package:swiftlink/screens/preference/preference_screen_binding.dart';
@@ -29,16 +29,16 @@ class RegistrationScreenController extends GetxController {
   });
 
   Future<void> checkEmailAvailable() async {
-    bool? isAvailable = await BaseFirebaseServices.checkIfUserNameAvailable(userName: userName.text);
+    bool? isAvailable = await BaseFirebaseServices.checkIfUserNameAvailable(userName: userName.text.trim());
     if (isAvailable == true) {
       await createUser();
     }
   }
 
   Future<void> createUser() async {
-    user.userName = userName.text;
-    user.firstName = firstName.text;
-    user.lastName = lastName.text;
+    user.userName = userName.text.trim();
+    user.firstName = firstName.text.trim();
+    user.lastName = lastName.text.trim();
     user.jwtToken = await FirebaseMessaging.instance.getToken() ?? '';
     user.systemId = getStorage.read(LocalStorageKey.systemId);
     User? getUser = await BaseFirebaseServices.createNewUser(user: user);
@@ -48,9 +48,9 @@ class RegistrationScreenController extends GetxController {
       getStorage.write(LocalStorageKey.currentUserUsereName, userName.text);
       UserContact? userContact = await BaseFirebaseServices.userContact(
         userContact: UserContact(
-          optAddressOne: location.text,
+          optAddressOne: location.text.trim(),
           systemId: getStorage.read(LocalStorageKey.systemId),
-          userName: userName.text,
+          userName: userName.text.trim(),
         ),
         userId: user.id!,
       );

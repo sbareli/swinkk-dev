@@ -7,14 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:swiftlink/common/constants/firebase_table_name.dart';
 import 'package:swiftlink/common/constants/local_storage_key.dart';
-import 'package:swiftlink/models/service.dart';
+import 'package:swiftlink/models/service_model.dart';
 import 'package:swiftlink/models/user_contact.dart';
 import 'package:swiftlink/models/user_prefrence.dart';
 import 'package:swiftlink/services/base_firebase_services.dart';
 
-import '../models/entities/user.dart';
+import '../models/user_model.dart';
 
 class FireStoreUtils {
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -47,13 +48,13 @@ class FireStoreUtils {
 
       if (user != null) {
         user.jwtToken = await firebaseMessaging.getToken() ?? '';
-        await createNewAccount(user);
         return {
           'data': {
             'statusCode': '300',
-            'id': null,
+            'user': user,
+            'id': userCredential.user?.uid,
           },
-          'successMessgae': null,
+          'successMessage': null,
           'errorMessage': null,
         };
       } else if (user == null) {
@@ -62,20 +63,20 @@ class FireStoreUtils {
             'statusCode': '200',
             'id': userCredential.user?.uid,
           },
-          'successMessgae': null,
+          'successMessage': null,
           'errorMessage': null,
         };
       } else {
         return {
           'data': null,
-          'successMessgae': null,
+          'successMessage': null,
           'errorMessage': 'Create new user with phone number.',
         };
       }
     } on auth.FirebaseAuthException catch (e) {
       return {
         'data': null,
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': e.code,
       };
     }
@@ -85,21 +86,25 @@ class FireStoreUtils {
     QuerySnapshot<Map<String, dynamic>> userDocument = await firestore
         .collection(FirebaseTable.user)
         .where(
-          userName,
+          'user_name',
           isEqualTo: userName,
         )
+        .where(
+          'system_id',
+          isEqualTo: getStorage.read(LocalStorageKey.systemId),
+        )
         .get();
-    debugPrint(userDocument.docs.isEmpty.toString() + 'USERNAME AVAILABLE');
+    debugPrint(userDocument.docs.isEmpty.toString() + ' USERNAME AVAILABLE');
     if (userDocument.docs.isEmpty) {
       return {
         'data': true,
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': null,
       };
     } else {
       return {
         'data': false,
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': 'This user name already taken !!',
       };
     }
@@ -111,7 +116,7 @@ class FireStoreUtils {
         debugPrint('User Created : ${user.id}');
         return {
           'data': user,
-          'successMessgae': 'Account Created succefully',
+          'successMessage': null,
           'errorMessage': null,
         };
       });
@@ -119,34 +124,45 @@ class FireStoreUtils {
       debugPrint('Error User Created : ${e.message}');
       return {
         'data': null,
-        'successMessgae': null,
-        'errorMessage': e.message,
+        'successMessage': null,
+        'errorMessage': e.code,
       };
     }
   }
 
   static Future<Map<String, dynamic>> getCurrentUser(String uid) async {
     try {
-      DocumentSnapshot<Map<String, dynamic>> userDocument = await firestore.collection(FirebaseTable.user).doc(uid).get();
-      if (userDocument.data() != null && userDocument.exists) {
-        debugPrint('Current User  : ${userDocument.data()}');
+      QuerySnapshot<Map<String, dynamic>> userDocument = await firestore
+          .collection(FirebaseTable.user)
+          .where(
+            'system_id',
+            isEqualTo: getStorage.read(LocalStorageKey.systemId),
+          )
+          .where(
+            'id',
+            isEqualTo: uid,
+          )
+          .get();
+      List<User> users = userDocument.docs.map((doc) => User.fromJson(doc.data())).toList();
+      if (users.isNotEmpty) {
+        debugPrint('Current User  : ${users.first.id}');
         return {
-          'data': User.fromJson(userDocument.data()!),
-          'successMessgae': 'Account Created succefully',
+          'data': users.first,
+          'successMessage': null,
           'errorMessage': null,
         };
       } else {
         return {
           'data': null,
-          'successMessgae': null,
-          'errorMessage': 'Something Went Wrong',
+          'successMessage': null,
+          'errorMessage': null,
         };
       }
     } on auth.FirebaseException catch (e) {
       debugPrint('Error Get Current User : ${e.message}');
       return {
         'data': null,
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': e.message,
       };
     }
@@ -158,7 +174,7 @@ class FireStoreUtils {
         debugPrint('Add User Contact : $userContact');
         return {
           'data': userContact,
-          'successMessgae': null,
+          'successMessage': null,
           'errorMessage': null,
         };
       });
@@ -166,25 +182,66 @@ class FireStoreUtils {
       debugPrint('Error Add User Contact : ${e.message}');
       return {
         'data': null,
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': e.message,
       };
     }
   }
 
-  static Future<Map<String, dynamic>> getService() async {
+  static Future<Map<String, dynamic>> getService(String systemId) async {
     try {
-      QuerySnapshot serviceCollection = await firestore.collection(FirebaseTable.service).get();
+      QuerySnapshot serviceCollection = await firestore
+          .collection(FirebaseTable.service)
+          .where(
+            'system_id',
+            isEqualTo: systemId,
+          )
+          .get();
       return {
         'data': serviceCollection.docs.map((doc) => ServiceModel.fromJson(doc.data() as Map<String, dynamic>)).toList(),
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': null,
       };
     } on auth.FirebaseException catch (e) {
       debugPrint('Error Get Service : ${e.message}');
       return {
         'data': null,
-        'successMessgae': null,
+        'successMessage': null,
+        'errorMessage': e.message,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> getSelectedService(String userName) async {
+    try {
+      QuerySnapshot userPrefrence = await firestore
+          .collection(FirebaseTable.userPreferences)
+          .where(
+            'system_id',
+            isEqualTo: getStorage.read(LocalStorageKey.systemId),
+          )
+          .where(
+            'user_name',
+            isEqualTo: userName,
+          )
+          .get();
+      List<UserPrefrence> userPrefrenceList = userPrefrence.docs.map((doc) => UserPrefrence.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return {
+        'data': userPrefrenceList.isNotEmpty
+            ? userPrefrenceList.first
+            : UserPrefrence(
+                serviceCategory: null,
+                systemId: null,
+                userName: null,
+              ),
+        'successMessage': null,
+        'errorMessage': null,
+      };
+    } on auth.FirebaseException catch (e) {
+      debugPrint('Error Get Service : ${e.message}');
+      return {
+        'data': null,
+        'successMessage': null,
         'errorMessage': e.message,
       };
     }
@@ -196,7 +253,7 @@ class FireStoreUtils {
         debugPrint('Add User Prefrence : $userPrefrence');
         return {
           'data': userPrefrence,
-          'successMessgae': null,
+          'successMessage': null,
           'errorMessage': null,
         };
       });
@@ -204,7 +261,7 @@ class FireStoreUtils {
       debugPrint('Error Add User Prefrence : ${e.message}');
       return {
         'data': null,
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': e.message,
       };
     }
@@ -214,99 +271,50 @@ class FireStoreUtils {
     QuerySnapshot<Map<String, dynamic>> userDocument = await firestore
         .collection(FirebaseTable.userPreferences)
         .where(
-          'userName',
+          'user_name',
           isEqualTo: userName,
+        )
+        .where(
+          'system_id',
+          isEqualTo: getStorage.read(LocalStorageKey.systemId),
         )
         .get();
     debugPrint(userDocument.docs.isEmpty.toString() + 'Service Not Added');
     if (userDocument.docs.isEmpty) {
       return {
         'data': true,
-        'successMessgae': null,
+        'successMessage': null,
         'errorMessage': null,
       };
     } else {
       return {
         'data': false,
-        'successMessgae': null,
-        'errorMessage': null,
-      };
-    }
-  }
-
-  // static Future<User?> getService(User user) async {
-  //   //UserPreference.setUserId(userID: user.userID);
-  //   return await firestore.collection(FirebaseTable.user).doc(user.id).set(user.toJson()).then((document) {
-  //     return user;
-  //   });
-  // }
-
-  static Future<String?> firebaseCreateNewUserWithEmail({required String email, required String password, required String serviceId}) async {
-    try {
-      auth.FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password).then((value) async {
-        firestore.collection("User").doc(value.user!.uid).set({
-          "uid": value.user!.uid,
-          'email': email,
-          'system_id': serviceId,
-        });
-
-        if (value.user != null && !value.user!.emailVerified) {
-          await value.user!.sendEmailVerification();
-        }
-
-        return value;
-      });
-    } on auth.FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        Get.snackbar("warrning", "The password provided is too weak.");
-        // ignore: avoid_print
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        Get.snackbar("warrning", "The account already exists for that email.");
-        // ignore: avoid_print
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      // ignore: avoid_print
-      print(e);
-    }
-    return null;
-  }
-
-  static Future<Map<String, dynamic>> loginWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      auth.UserCredential result = await auth.FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-      DocumentSnapshot<Map<String, dynamic>> documentSnapshot = await firestore.collection(FirebaseTable.user).doc(result.user?.uid ?? '').get();
-      User? user;
-      if (documentSnapshot.exists) {
-        user = User.fromJson(documentSnapshot.data() ?? {});
-      }
-      return {
-        'data': user,
         'successMessage': null,
         'errorMessage': null,
       };
-    } on auth.FirebaseAuthException catch (exception, _) {
+    }
+  }
+
+  static Future<Map<String, dynamic>> signOut() async {
+    try {
+      await auth.FirebaseAuth.instance.signOut();
+      getStorage.erase();
       return {
-        'data': null,
-        'successMessgae': null,
-        'errorMessage': exception.code,
+        'data': true,
+        'successMessage': null,
+        'errorMessage': null,
       };
-    } catch (e, _) {
+    } on auth.FirebaseAuthException catch (e) {
+      debugPrint('Error Add User Prefrence : ${e.message}');
       return {
-        'data': null,
-        'successMessgae': null,
-        'errorMessage': 'Login failed, Please try again.',
+        'data': false,
+        'successMessage': null,
+        'errorMessage': e.message,
       };
     }
   }
 
-  static loginWithFacebook() async {
-    /// creates a user for this facebook login when this user first time login
-    /// and save the new user object to firebase and firebase auth
+  static Future<Map<String, dynamic>> loginWithFacebook() async {
     FacebookAuth facebookAuth = FacebookAuth.instance;
     bool isLogged = await facebookAuth.accessToken != null;
     if (!isLogged) {
@@ -318,11 +326,16 @@ class FireStoreUtils {
           'pages_messaging',
           'pages_manage_metadata'
         ],
-      ); // by default we request the email and the public profile
+      );
       if (result.status == LoginStatus.success) {
-        // you are logged
         AccessToken? token = await facebookAuth.accessToken;
         return await handleFacebookLogin(await facebookAuth.getUserData(), token!);
+      } else {
+        return {
+          'data': null,
+          'successMessage': null,
+          'errorMessage': 'Facebook authentication failed, Please try again',
+        };
       }
     } else {
       AccessToken? token = await facebookAuth.accessToken;
@@ -330,40 +343,107 @@ class FireStoreUtils {
     }
   }
 
-  static handleFacebookLogin(Map<String, dynamic> userData, AccessToken token) async {
-    auth.UserCredential authResult = await auth.FirebaseAuth.instance.signInWithCredential(auth.FacebookAuthProvider.credential(token.token));
-    User? user = await BaseFirebaseServices.getCurrentUser(userId: authResult.user?.uid ?? '');
-    List<String> fullName = (userData['name'] as String).split(' ');
-    String firstName = '';
-    String lastName = '';
-    if (fullName.isNotEmpty) {
-      firstName = fullName.first;
-      lastName = fullName.skip(1).join(' ');
-    }
-    if (user != null) {
-      user.picture = userData['picture']['data']['url'];
-      user.firstName = firstName;
-      user.lastName = lastName;
-      user.email = userData['email'];
-      //user.active = true;
-      user.jwtToken = await firebaseMessaging.getToken() ?? '';
-      dynamic result = await createNewAccount(user);
-      return result;
-    } else if (user == null) {
-      user = User(
-        email: userData['email'] ?? '',
-        firstName: firstName,
-        picture: userData['picture']['data']['url'] ?? '',
-        id: authResult.user?.uid ?? '',
-        lastName: lastName,
-        jwtToken: await firebaseMessaging.getToken() ?? '',
-      );
-      Map<String, dynamic> response = await createNewAccount(user);
-      if (response['data'] != null) {
-        return user;
+  static Future<Map<String, dynamic>> handleFacebookLogin(Map<String, dynamic> userData, AccessToken token) async {
+    try {
+      auth.UserCredential authResult = await auth.FirebaseAuth.instance.signInWithCredential(auth.FacebookAuthProvider.credential(token.token));
+      User? user = await BaseFirebaseServices.getCurrentUser(userId: authResult.user?.uid ?? '');
+
+      if (user != null) {
+        user.jwtToken = await firebaseMessaging.getToken();
+        user.picture = authResult.user?.photoURL;
+        user.systemId = getStorage.read(LocalStorageKey.systemId);
+        return {
+          'data': user,
+          'successMessage': null,
+          'errorMessage': null,
+        };
       } else {
-        return response['errorMessage'];
+        user = User(
+          id: authResult.user?.uid,
+          email: userData['email'],
+          picture: userData['picture']['data']['url'],
+          systemId: getStorage.read(LocalStorageKey.systemId),
+          jwtToken: await firebaseMessaging.getToken(),
+        );
+        User? result = await BaseFirebaseServices.createNewUser(user: user);
+        if (result != null) {
+          return {
+            'data': user,
+            'successMessage': null,
+            'errorMessage': null,
+          };
+        } else {
+          return {
+            'data': null,
+            'successMessage': null,
+            'errorMessage': 'Facebook authentication failed, Please try again',
+          };
+        }
       }
+    } catch (e) {
+      return {
+        'data': null,
+        'successMessage': null,
+        'errorMessage': 'Facebook authentication failed, Please try again',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> loginWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final auth.AuthCredential credential = auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      auth.UserCredential authResult = await auth.FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = await BaseFirebaseServices.getCurrentUser(userId: authResult.user?.uid ?? '');
+      if (user != null) {
+        user.jwtToken = await firebaseMessaging.getToken();
+        user.picture = authResult.user?.photoURL;
+        user.systemId = getStorage.read(LocalStorageKey.systemId);
+        return {
+          'data': user,
+          'successMessage': null,
+          'errorMessage': null,
+        };
+      } else {
+        String? jwtToken = await firebaseMessaging.getToken();
+        user = User(
+          id: authResult.user?.uid,
+          email: authResult.user?.email,
+          picture: authResult.user?.photoURL,
+          systemId: getStorage.read(LocalStorageKey.systemId),
+          jwtToken: jwtToken,
+        );
+        User? result = await BaseFirebaseServices.createNewUser(user: user);
+        if (result != null) {
+          return {
+            'data': result,
+            'successMessage': null,
+            'errorMessage': null,
+          };
+        } else {
+          return {
+            'data': null,
+            'successMessage': null,
+            'errorMessage': 'Google authentication failed, Please try again',
+          };
+        }
+      }
+    } on auth.FirebaseAuthException catch (_) {
+      return {
+        'data': null,
+        'successMessage': null,
+        'errorMessage': _.message,
+      };
+    } catch (e) {
+      return {
+        'data': null,
+        'successMessage': null,
+        'errorMessage': 'Google authentication failed, Please try again',
+      };
     }
   }
 

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:swiftlink/models/entities/index.dart';
+import 'package:swiftlink/models/user_model.dart';
 import 'package:swiftlink/screens/authentication/otp_verify/otp_verify_screen_controller.dart';
 
 class OtpVerifyScreenBinding implements Bindings {

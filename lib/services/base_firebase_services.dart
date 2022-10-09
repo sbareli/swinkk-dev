@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:swiftlink/models/entities/user.dart';
-import 'package:swiftlink/models/service.dart';
+import 'package:swiftlink/models/user_model.dart';
+import 'package:swiftlink/models/service_model.dart';
 import 'package:swiftlink/models/user_contact.dart';
 import 'package:swiftlink/models/user_prefrence.dart';
 import 'package:swiftlink/services/firebase_helper.dart';
@@ -33,6 +33,16 @@ class BaseFirebaseServices {
     return checkAuthResponse(response);
   }
 
+  static Future<User?> signUpOrInWithFacebook() async {
+    Map<String, dynamic> response = await FireStoreUtils.loginWithFacebook();
+    return checkResponse(response);
+  }
+
+  static Future<User?> signUpOrInWithGoogle() async {
+    Map<String, dynamic> response = await FireStoreUtils.loginWithGoogle();
+    return checkResponse(response);
+  }
+
   static Future<UserContact?> userContact({
     required UserContact userContact,
     required String userId,
@@ -51,8 +61,13 @@ class BaseFirebaseServices {
     return checkAuthResponse(response);
   }
 
-  static Future<List<ServiceModel>> getService() async {
-    Map<String, dynamic> response = await FireStoreUtils.getService();
+  static Future<List<ServiceModel>> getService(String systemId) async {
+    Map<String, dynamic> response = await FireStoreUtils.getService(systemId);
+    return checkResponse(response);
+  }
+
+  static Future<UserPrefrence>? getSelectedService(String userName) async {
+    Map<String, dynamic> response = await FireStoreUtils.getSelectedService(userName);
     return checkResponse(response);
   }
 
@@ -66,19 +81,24 @@ class BaseFirebaseServices {
     return checkResponse(response);
   }
 
-  static Future<User?> loginFirebaseEmail({
-    required String email,
-    required String password,
-  }) async {
-    Map<String, dynamic> response = await FireStoreUtils.loginWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    return checkResponse(response);
+  static Future<bool>? signOut() async {
+    Map<String, dynamic> response = await FireStoreUtils.signOut();
+    return checkAuthResponse(response);
   }
 
+  // static Future<User?> loginFirebaseEmail({
+  //   required String email,
+  //   required String password,
+  // }) async {
+  //   Map<String, dynamic> response = await FireStoreUtils.loginWithEmailAndPassword(
+  //     email: email,
+  //     password: password,
+  //   );
+  //   return checkResponse(response);
+  // }
+
   static checkResponse(Map<String, dynamic> response) {
-    if (response['errorMessgae'] == null) {
+    if (response['errorMessage'] == null) {
       if (response['successMessage'] != null) {
         showSuccess(
           title: 'Success',
@@ -89,7 +109,7 @@ class BaseFirebaseServices {
     } else {
       showError(
         title: 'Error',
-        errorMessage: response['errorMessgae'],
+        errorMessage: response['errorMessage'],
       );
       return null;
     }
@@ -105,17 +125,19 @@ class BaseFirebaseServices {
       }
       return response['data'];
     } else {
-      showError(
-        title: 'Error',
-        errorMessage: getErrorMessgae(
-          response['errorMessage'],
-        ),
-      );
+      if (response['errorMessage'] != null) {
+        showError(
+          title: 'Error',
+          errorMessage: getErrorMessage(
+            response['errorMessage'],
+          ),
+        );
+      }
       return null;
     }
   }
 
-  static String getErrorMessgae(String exceptionCode) {
+  static String getErrorMessage(String exceptionCode) {
     switch (exceptionCode) {
       case 'invalid-email':
         return 'Email address is malformed.';

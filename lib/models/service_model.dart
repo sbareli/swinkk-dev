@@ -21,9 +21,9 @@ class ServiceModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['rank'] = rank;
-    data['systemId'] = systemId;
+    data['system_id'] = systemId;
     data['serviceName'] = serviceName;
-    data['serviceCategory'] = serviceCategory;
+    data['service_category'] = serviceCategory;
     return data;
   }
 }

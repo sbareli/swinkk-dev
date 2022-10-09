@@ -1,14 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swiftlink/common/constants/app_asset.dart';
 import 'package:swiftlink/common/theme/theme.dart';
+import 'package:swiftlink/common/utils/colors.dart';
+import 'package:swiftlink/screens/authentication/controller/auth_controller.dart';
 import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen.dart';
-import 'package:swiftlink/screens/authentication/sign_up/sign_up_screen_controller.dart';
 import 'package:swiftlink/services/validators.dart';
 
-class SignUpScreen extends GetView<SignUpScreenController> {
-  const SignUpScreen({Key? key}) : super(key: key);
+class SignUpScreen extends GetView<AuthController> {
+  SignUpScreen({Key? key}) : super(key: key);
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +20,7 @@ class SignUpScreen extends GetView<SignUpScreenController> {
       body: SingleChildScrollView(
         child: Container(
           decoration: const BoxDecoration(
+            color: lightBackgroundColor,
             image: DecorationImage(
               image: AssetImage(AppAsset.registerOneAndTwo),
               fit: BoxFit.cover,
@@ -37,113 +42,170 @@ class SignUpScreen extends GetView<SignUpScreenController> {
                     style: Theme.of(context).textTheme.headline6,
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    height: 415,
-                    child: Form(
-                      key: controller.formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: controller.phoneNumber,
-                            validator: (String? value) => Validators.validatePhoneNumber(value),
-                            decoration: const InputDecoration(
-                              hintText: 'Mobile Number',
-                              helperText: '',
-                              isDense: true,
-                              prefixIcon: Align(
-                                  widthFactor: 2.5,
-                                  heightFactor: 1,
-                                  child: Icon(
-                                    Icons.phone,
-                                    size: 20,
-                                    color: Color(0xffFB9A08),
-                                  )),
+                  Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: controller.phoneNumber,
+                          validator: (String? value) => Validators.validatePhoneNumber(value),
+                          decoration: const InputDecoration(
+                            hintText: 'Mobile Number',
+                            helperText: '',
+                            isDense: true,
+                            prefixIcon: Align(
+                                widthFactor: 2.5,
+                                heightFactor: 1,
+                                child: Icon(
+                                  Icons.phone,
+                                  size: 20,
+                                  color: Color(0xffFB9A08),
+                                )),
+                          ),
+                        ),
+                        // TextFormField(
+                        //   obscureText: true,
+                        //   controller: controller.password,
+                        //   validator: (String? value) => Validators.validatePassword(value),
+                        //   decoration: InputDecoration(
+                        //     hintText: 'Password',
+                        //     helperText: '',
+                        //     isDense: true,
+                        //     prefixIcon: Align(
+                        //       widthFactor: 3.2,
+                        //       heightFactor: 1,
+                        //       child: Image.asset(
+                        //         AppAsset.lockIcon,
+                        //         scale: 2,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // TextFormField(
+                        //   obscureText: true,
+                        //   controller: controller.confirmPassword,
+                        //   validator: (String? value) => Validators.validateConfirmPassword(
+                        //     value,
+                        //     password: controller.password.text,
+                        //   ),
+                        //   decoration: InputDecoration(
+                        //     hintText: 'Confirm Password',
+                        //     helperText: '',
+                        //     isDense: true,
+                        //     prefixIcon: Align(
+                        //       widthFactor: 3.2,
+                        //       heightFactor: 1,
+                        //       child: Image.asset(
+                        //         AppAsset.lockIcon,
+                        //         scale: 2,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // const SizedBox(
+                        //   height: 40,
+                        // ),
+                        TextButton(
+                          onPressed: () async {
+                            if (formKey.currentState!.validate()) {
+                              controller.signupWithMobileNumber();
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                            minimumSize: const Size.fromHeight(50),
+                          ),
+                          child: const Text('Next'),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          'or sign up with your social media',
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            authButtons(
+                              imagePath: 'assets/images/google.png',
+                              function: () async {
+                                controller.signupWithGoogle();
+                              },
                             ),
-                          ),
-                          // TextFormField(
-                          //   obscureText: true,
-                          //   controller: controller.password,
-                          //   validator: (String? value) => Validators.validatePassword(value),
-                          //   decoration: InputDecoration(
-                          //     hintText: 'Password',
-                          //     helperText: '',
-                          //     isDense: true,
-                          //     prefixIcon: Align(
-                          //       widthFactor: 3.2,
-                          //       heightFactor: 1,
-                          //       child: Image.asset(
-                          //         AppAsset.lockIcon,
-                          //         scale: 2,
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                          // TextFormField(
-                          //   obscureText: true,
-                          //   controller: controller.confirmPassword,
-                          //   validator: (String? value) => Validators.validateConfirmPassword(
-                          //     value,
-                          //     password: controller.password.text,
-                          //   ),
-                          //   decoration: InputDecoration(
-                          //     hintText: 'Confirm Password',
-                          //     helperText: '',
-                          //     isDense: true,
-                          //     prefixIcon: Align(
-                          //       widthFactor: 3.2,
-                          //       heightFactor: 1,
-                          //       child: Image.asset(
-                          //         AppAsset.lockIcon,
-                          //         scale: 2,
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              if (controller.formKey.currentState!.validate()) {
-                                controller.signupWithMobileNumber();
-                              }
-                            },
-                            style: TextButton.styleFrom(
-                              minimumSize: const Size.fromHeight(50),
+                            authButtons(
+                              imagePath: 'assets/images/facebook.png',
+                              function: () async {
+                                await controller.signupWithFacebook();
+                              },
                             ),
-                            child: const Text('Next'),
+                            if (Platform.isIOS)
+                              authButtons(
+                                imagePath: 'assets/images/apple.png',
+                                function: () {},
+                              ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            text: 'Already have an account? ',
+                            children: [
+                              TextSpan(
+                                text: 'Sign In',
+                                style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Get.to(
+                                      () => SignInScreen(),
+                                    );
+                                  },
+                              ),
+                            ],
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              text: 'Already have an account? ',
-                              children: [
-                                TextSpan(
-                                  text: 'Sign In',
-                                  style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Get.to(
-                                        () => const SignInScreen(),
-                                      );
-                                    },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                      ],
                     ),
                   )
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget authButtons({
+    required String imagePath,
+    required Function() function,
+  }) {
+    return GestureDetector(
+      onTap: function,
+      child: Container(
+        padding: const EdgeInsets.all(5.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.10),
+              spreadRadius: 0.5,
+              blurRadius: 5,
+              offset: const Offset(0, 2.0),
+            ),
+          ],
+        ),
+        child: Image.asset(
+          imagePath,
+          height: 45,
+          width: 45,
         ),
       ),
     );

@@ -24,6 +24,7 @@ const Color darkGreyBlue = Color(0xff2B2C36); //505050
 const Color titleBlack = Color(0xff333333);
 
 const Color lightappColor = Color(0xffFFE7E7);
+const Color lightBackgroundColor = Color(0xffEBF8FF);
 const Color red = Color(0xffE8001B);
 const Color orange = Color(0xffF27121);
 const Color redcolor = Color(0xffE94057);

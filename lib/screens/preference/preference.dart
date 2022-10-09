@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hexagon/hexagon.dart';
 import 'package:swiftlink/common/theme/theme.dart';
 import 'package:swiftlink/common/utils/colors.dart';
+import 'package:swiftlink/screens/home/home_screen.dart';
 import 'package:swiftlink/screens/preference/preference_screen_controller.dart';
 
 class PreferenceScreen extends GetView<PreferenceScreenController> {
@@ -102,9 +103,22 @@ class PreferenceScreen extends GetView<PreferenceScreenController> {
                 const SizedBox(
                   height: 22,
                 ),
-                const Text.rich(
-                  TextSpan(
-                    text: 'skip',
+                TextButton(
+                  onPressed: () {
+                    Get.offAll(() => const HomeScreen());
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      Colors.transparent,
+                    ),
+                  ),
+                  child: const Text(
+                    'Skip',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: blackColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const SizedBox(

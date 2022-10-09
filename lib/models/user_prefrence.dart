@@ -11,15 +11,15 @@ class UserPrefrence {
 
   UserPrefrence.fromJson(Map<String, dynamic> json) {
     systemId = json['system_id'];
-    userName = json['userName'];
+    userName = json['user_name'];
     serviceCategory = json['service_category'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['systemId'] = systemId;
-    data['userName'] = userName;
-    data['serviceCategory'] = serviceCategory;
+    data['system_id'] = systemId;
+    data['user_name'] = userName;
+    data['service_category'] = serviceCategory;
     return data;
   }
 }

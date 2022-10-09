@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:swiftlink/models/entities/user.dart';
+import 'package:swiftlink/models/user_model.dart';
+import 'package:swiftlink/screens/authentication/controller/auth_bindings.dart';
 import 'package:swiftlink/screens/home/home_screen.dart';
 import 'package:swiftlink/services/base_firebase_services.dart';
 import 'package:swiftlink/services/firebase_helper.dart';
@@ -10,7 +11,6 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:swiftlink/screens/preference/preference.dart';
 import 'package:swiftlink/common/constants/local_storage_key.dart';
 import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen.dart';
-import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen_binding.dart';
 import 'package:swiftlink/screens/preference/preference_screen_binding.dart';
 
 class SplashScreenController extends GetxController {
@@ -46,20 +46,20 @@ class SplashScreenController extends GetxController {
             }
           } else {
             Get.offAll(
-              () => const SignInScreen(),
-              binding: SigninScreenBindings(),
+              () => SignInScreen(),
+              binding: AuthBinding(),
             );
           }
         } else {
           Get.offAll(
-            () => const SignInScreen(),
-            binding: SigninScreenBindings(),
+            () => SignInScreen(),
+            binding: AuthBinding(),
           );
         }
       } else {
         Get.offAll(
-          () => const SignInScreen(),
-          binding: SigninScreenBindings(),
+          () => SignInScreen(),
+          binding: AuthBinding(),
         );
       }
     });

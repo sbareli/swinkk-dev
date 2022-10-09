@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:swiftlink/common/constants/local_storage_key.dart';
-import 'package:swiftlink/models/entities/index.dart';
-import 'package:swiftlink/models/service.dart';
+import 'package:swiftlink/models/user_model.dart';
+import 'package:swiftlink/models/service_model.dart';
 import 'package:swiftlink/models/user_prefrence.dart';
 import 'package:swiftlink/screens/home/home_screen.dart';
 import 'package:swiftlink/services/base_firebase_services.dart';
@@ -19,12 +20,28 @@ class PreferenceScreenController extends GetxController {
   @override
   void onInit() {
     getServiceList();
+    getSelectedServiceList();
     super.onInit();
   }
 
   void getServiceList() async {
-    servicesList.value = await BaseFirebaseServices.getService();
+    debugPrint(getsStorage.read(LocalStorageKey.systemId).toString() + ' SYSTEMID');
+    servicesList.value = await BaseFirebaseServices.getService(
+      getsStorage.read(LocalStorageKey.systemId),
+    );
     update();
+  }
+
+  void getSelectedServiceList() async {
+    UserPrefrence? userPrefrence = await BaseFirebaseServices.getSelectedService(
+      user.userName!,
+    );
+    if (userPrefrence != null) {
+      userPrefrence.serviceCategory?.forEach((element) {
+        selectedServices.add(element);
+      });
+      update();
+    }
   }
 
   void selectService(bool isValidRange, int index) {

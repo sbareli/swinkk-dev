@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swiftlink/common/constants/app_asset.dart';
+import 'package:swiftlink/common/utils/colors.dart';
 import 'package:swiftlink/screens/authentication/otp_verify/otp_verify_screen_controller.dart';
 
 class VerifyCode extends GetView<OtpVerifyScreenController> {
@@ -25,6 +26,37 @@ class VerifyCode extends GetView<OtpVerifyScreenController> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  AppBar(
+                    elevation: 0.0,
+                    backgroundColor: Colors.transparent,
+                    leading: GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Container(
+                        height: 30,
+                        width: 30,
+                        margin: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: whiteColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.10),
+                              spreadRadius: 0.5,
+                              blurRadius: 5,
+                              offset: const Offset(0, 2.0),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_rounded,
+                          color: blackColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
                   Text(
                     'Enter verification code',
                     style: Theme.of(context).textTheme.headline6,
@@ -57,13 +89,16 @@ class VerifyCode extends GetView<OtpVerifyScreenController> {
                     child: const Text('Confirm'),
                   ),
                   const SizedBox(
-                    height: 50,
+                    height: 30,
                   ),
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
                     child: const Text.rich(
                       TextSpan(
                         text: 'Cancel',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
