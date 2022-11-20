@@ -1,4 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -6,11 +8,13 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:swiftlink/common/constants/local_storage_key.dart';
 import 'package:swiftlink/models/user_model.dart';
 import 'package:swiftlink/models/user_contact.dart';
+import 'package:swiftlink/screens/no_permissions/location_permission_screen.dart';
 import 'package:swiftlink/screens/preference/preference.dart';
 import 'package:swiftlink/screens/preference/preference_screen_binding.dart';
 import 'package:swiftlink/services/base_firebase_services.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:swiftlink/services/locale_service.dart';
 
 class RegistrationScreenController extends GetxController {
   TextEditingController userName = TextEditingController();
@@ -31,6 +35,20 @@ class RegistrationScreenController extends GetxController {
   Future<void> checkEmailAvailable() async {
     bool? isAvailable = await BaseFirebaseServices.checkIfUserNameAvailable(userName: userName.text.trim());
     if (isAvailable == true) {
+      if (location.text == '') {
+        Position? currentLocaiton = await LocaleService().currentPosition();
+        if (currentLocaiton != null) {
+          List<Placemark> placemarks = await placemarkFromCoordinates(
+            currentLocaiton.latitude,
+            currentLocaiton.longitude,
+          );
+          location.text = placemarks[0].locality.toString();
+        } else {
+          Get.to(
+            () => const NoLocationScreen(),
+          );
+        }
+      }
       await createUser();
     }
   }

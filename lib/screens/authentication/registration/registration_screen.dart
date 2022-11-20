@@ -90,7 +90,6 @@ class RegistrationScreen extends GetView<RegistrationScreenController> {
                     ),
                     TextFormField(
                       controller: controller.location,
-                      validator: (String? value) => value == null || value.isEmpty ? 'Home location is required' : null,
                       decoration: InputDecoration(
                         hintText: 'Home Location',
                         isDense: true,

@@ -104,7 +104,7 @@ class SignInScreen extends GetView<AuthController> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text('dontHaveAnAccount'.tr),
+                          const Text('Dont have an account? '),
                           GestureDetector(
                             onTap: () {
                               Get.to(
@@ -114,7 +114,7 @@ class SignInScreen extends GetView<AuthController> {
                               // Navigator.of(context).pushNamed(RouteList.register);
                             },
                             child: Text(
-                              ' signUp'.tr,
+                              'Sign Up',
                               style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
                             ),
                           ),

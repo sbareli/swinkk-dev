@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 // Padding
 const EdgeInsets horizonatal20 = EdgeInsets.symmetric(horizontal: 20);
-EdgeInsets customVerticalHorizontal20({double vertical = 0}) =>
-    EdgeInsets.symmetric(horizontal: 20, vertical: vertical);
+EdgeInsets customVerticalHorizontal20({double vertical = 0}) => EdgeInsets.symmetric(horizontal: 20, vertical: vertical);
 
 // Sizedbox
 SizedBox customWidth(double width) => SizedBox(width: width);
@@ -17,8 +16,7 @@ const SizedBox height15 = SizedBox(height: 15);
 const SizedBox height16 = SizedBox(height: 16);
 const SizedBox height20 = SizedBox(height: 20);
 
-BorderRadius circularBorderRadius(double radius) =>
-    BorderRadius.circular(radius);
+BorderRadius circularBorderRadius(double radius) => BorderRadius.circular(radius);
 BorderRadius circular5BorderRadius = BorderRadius.circular(4);
 BorderRadius circular8BorderRadius = BorderRadius.circular(8);
 BorderRadius circular10BorderRadius = BorderRadius.circular(10);
