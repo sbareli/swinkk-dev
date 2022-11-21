@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:swiftlink/screens/authentication/controller/auth_bindings.dart';
 import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen.dart';
-import 'package:swiftlink/services/base_firebase_services.dart';
+import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen_bindings.dart';
 import 'package:swiftlink/services/firebase_helper.dart';
 
 class HomeScreen extends GetView {
@@ -37,12 +36,12 @@ class HomeScreen extends GetView {
   }
 
   Future<void> signOutOntap() async {
-    bool? isSignOut = await BaseFirebaseServices.signOut();
+    bool? isSignOut = await FireStoreUtils.signOut();
     await FireStoreUtils.getSystem();
     if (isSignOut == true) {
       Get.offAll(
         () => SignInScreen(),
-        binding: AuthBinding(),
+        binding: SignInScreenBinding(),
       );
     }
   }

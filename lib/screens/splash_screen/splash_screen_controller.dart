@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:swiftlink/models/user_model.dart';
-import 'package:swiftlink/screens/authentication/controller/auth_bindings.dart';
+import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen_bindings.dart';
 import 'package:swiftlink/screens/home/home_screen.dart';
-import 'package:swiftlink/services/base_firebase_services.dart';
 import 'package:swiftlink/services/firebase_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:swiftlink/screens/preference/preference.dart';
@@ -28,10 +27,10 @@ class SplashScreenController extends GetxController {
       if (getStorage.read(LocalStorageKey.isLogging) == true) {
         auth.User? firebaseUser = auth.FirebaseAuth.instance.currentUser;
         if (firebaseUser != null) {
-          User? user = await BaseFirebaseServices.getCurrentUser(userId: firebaseUser.uid);
+          User? user = await FireStoreUtils.getCurrentUser(uid: firebaseUser.uid);
           if (user != null) {
             getStorage.write(LocalStorageKey.currentUser, user);
-            bool? isServiceAdded = await BaseFirebaseServices.isServiceAdded(user.userName!);
+            bool? isServiceAdded = await FireStoreUtils.ifServiceAdded(user.userName!);
             if (isServiceAdded == true) {
               Get.offAll(
                 () => const PreferenceScreen(),
@@ -47,19 +46,19 @@ class SplashScreenController extends GetxController {
           } else {
             Get.offAll(
               () => SignInScreen(),
-              binding: AuthBinding(),
+              binding: SignInScreenBinding(),
             );
           }
         } else {
           Get.offAll(
             () => SignInScreen(),
-            binding: AuthBinding(),
+            binding: SignInScreenBinding(),
           );
         }
       } else {
         Get.offAll(
           () => SignInScreen(),
-          binding: AuthBinding(),
+          binding: SignInScreenBinding(),
         );
       }
     });

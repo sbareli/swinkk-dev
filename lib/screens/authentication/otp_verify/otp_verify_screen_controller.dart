@@ -8,7 +8,7 @@ import 'package:swiftlink/screens/authentication/registration/registration_scree
 import 'package:swiftlink/screens/authentication/registration/registration_screen_binding.dart';
 import 'package:swiftlink/screens/preference/preference.dart';
 import 'package:swiftlink/screens/preference/preference_screen_binding.dart';
-import 'package:swiftlink/services/base_firebase_services.dart';
+import 'package:swiftlink/services/firebase_helper.dart';
 
 class OtpVerifyScreenController extends GetxController {
   User user = User();
@@ -24,7 +24,7 @@ class OtpVerifyScreenController extends GetxController {
   late TapGestureRecognizer onTapRecognizer;
 
   Future<void> submitPhoneNumber() async {
-    Map<String, dynamic>? responseCode = await BaseFirebaseServices.firebaseSubmitPhoneNumberCode(
+    Map<String, dynamic>? responseCode = await FireStoreUtils.firebaseSubmitPhoneNumberCode(
       code: codeController.text,
       phoneNumber: user.phoneNumber.toString(),
     );

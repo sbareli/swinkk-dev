@@ -6,7 +6,7 @@ import 'package:swiftlink/models/user_model.dart';
 import 'package:swiftlink/models/service_model.dart';
 import 'package:swiftlink/models/user_prefrence.dart';
 import 'package:swiftlink/screens/home/home_screen.dart';
-import 'package:swiftlink/services/base_firebase_services.dart';
+import 'package:swiftlink/services/firebase_helper.dart';
 
 class PreferenceScreenController extends GetxController {
   RxList<ServiceModel> servicesList = <ServiceModel>[].obs;
@@ -26,14 +26,14 @@ class PreferenceScreenController extends GetxController {
 
   void getServiceList() async {
     debugPrint(getsStorage.read(LocalStorageKey.systemId).toString() + ' SYSTEMID');
-    servicesList.value = await BaseFirebaseServices.getService(
+    servicesList.value = await FireStoreUtils.getService(
       getsStorage.read(LocalStorageKey.systemId),
     );
     update();
   }
 
   void getSelectedServiceList() async {
-    UserPrefrence? userPrefrence = await BaseFirebaseServices.getSelectedService(
+    UserPrefrence? userPrefrence = await FireStoreUtils.getSelectedService(
       user.userName!,
     );
     if (userPrefrence != null) {
@@ -61,7 +61,7 @@ class PreferenceScreenController extends GetxController {
       systemId: getsStorage.read(LocalStorageKey.systemId),
       userName: user.userName,
     );
-    UserPrefrence? userPrefrence = await BaseFirebaseServices.setServiceList(storeData, user.id!);
+    UserPrefrence? userPrefrence = await FireStoreUtils.setServiceList(storeData, user.id!);
     if (userPrefrence != null) {
       Get.off(() => const HomeScreen());
     }

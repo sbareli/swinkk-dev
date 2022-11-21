@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swiftlink/common/theme/theme.dart';
 import 'package:swiftlink/common/constants/app_asset.dart';
-import 'package:swiftlink/screens/authentication/controller/auth_bindings.dart';
-import 'package:swiftlink/screens/authentication/controller/auth_controller.dart';
+import 'package:swiftlink/common/utils/colors.dart';
+import 'package:swiftlink/common/utils/static_decoration.dart';
+import 'package:swiftlink/screens/authentication/forgot_password/forgot_password_screen.dart';
+import 'package:swiftlink/screens/authentication/forgot_password/forgot_password_screen_bindings.dart';
+import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen_controller.dart';
 import 'package:swiftlink/screens/authentication/sign_up/sign_up_screen.dart';
+import 'package:swiftlink/screens/authentication/sign_up/sign_up_screen_bindings.dart';
 import 'package:swiftlink/services/validators.dart';
 
-class SignInScreen extends GetView<AuthController> {
+class SignInScreen extends GetView<SignInScreenController> {
   SignInScreen({Key? key}) : super(key: key);
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -34,32 +38,65 @@ class SignInScreen extends GetView<AuthController> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      Text(
-                        'Sign in',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                      const SizedBox(height: 50),
                       TextFormField(
-                        controller: controller.phoneNumber,
-                        validator: (String? value) => Validators.validatePhoneNumber(value),
+                        controller: controller.email,
+                        validator: (String? value) => Validators.validateEmail(value),
                         decoration: const InputDecoration(
-                          hintText: 'Mobile Number',
+                          hintText: 'Enter email',
                           helperText: '',
                           isDense: true,
                           prefixIcon: Align(
                               widthFactor: 2.5,
                               heightFactor: 1,
                               child: Icon(
-                                Icons.phone,
+                                Icons.email_outlined,
                                 size: 20,
                                 color: Color(0xffFB9A08),
                               )),
                         ),
                       ),
+                      TextFormField(
+                        obscureText: true,
+                        controller: controller.password,
+                        validator: (String? value) => Validators.validatePassword(value),
+                        decoration: InputDecoration(
+                          hintText: 'Password',
+                          helperText: '',
+                          isDense: true,
+                          prefixIcon: Align(
+                            widthFactor: 3.2,
+                            heightFactor: 1,
+                            child: Image.asset(
+                              AppAsset.lockIcon,
+                              scale: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.to(
+                              () => ForgotPasswordScreen(),
+                              binding: ForgotPasswordScreenBinding(),
+                            );
+                          },
+                          child: const Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              color: appColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                      height20,
                       TextButton(
                         onPressed: () async {
                           if (formKey.currentState!.validate()) {
-                            controller.signupWithMobileNumber();
+                            controller.signIpWithEmailPassword(context);
                           }
                         },
                         style: TextButton.styleFrom(
@@ -74,7 +111,7 @@ class SignInScreen extends GetView<AuthController> {
                         'or sign up with your social media',
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 15,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -109,9 +146,8 @@ class SignInScreen extends GetView<AuthController> {
                             onTap: () {
                               Get.to(
                                 () => SignUpScreen(),
-                                binding: AuthBinding(),
+                                binding: SignUpScreenBinding(),
                               );
-                              // Navigator.of(context).pushNamed(RouteList.register);
                             },
                             child: Text(
                               'Sign Up',
@@ -121,7 +157,7 @@ class SignInScreen extends GetView<AuthController> {
                         ],
                       ),
                       const SizedBox(
-                        height: 30,
+                        height: 20,
                       ),
                     ],
                   ),

@@ -11,9 +11,9 @@ import 'package:swiftlink/models/user_contact.dart';
 import 'package:swiftlink/screens/no_permissions/location_permission_screen.dart';
 import 'package:swiftlink/screens/preference/preference.dart';
 import 'package:swiftlink/screens/preference/preference_screen_binding.dart';
-import 'package:swiftlink/services/base_firebase_services.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:swiftlink/services/firebase_helper.dart';
 import 'package:swiftlink/services/locale_service.dart';
 
 class RegistrationScreenController extends GetxController {
@@ -33,7 +33,7 @@ class RegistrationScreenController extends GetxController {
   });
 
   Future<void> checkEmailAvailable() async {
-    bool? isAvailable = await BaseFirebaseServices.checkIfUserNameAvailable(userName: userName.text.trim());
+    bool isAvailable = await FireStoreUtils.checkIfUserNameAvailable(userName: userName.text.trim());
     if (isAvailable == true) {
       if (location.text == '') {
         Position? currentLocaiton = await LocaleService().currentPosition();
@@ -59,12 +59,12 @@ class RegistrationScreenController extends GetxController {
     user.lastName = lastName.text.trim();
     user.jwtToken = await FirebaseMessaging.instance.getToken() ?? '';
     user.systemId = getStorage.read(LocalStorageKey.systemId);
-    User? getUser = await BaseFirebaseServices.createNewUser(user: user);
+    User? getUser = await FireStoreUtils.createNewAccount(user: user);
     if (getUser != null) {
       getStorage.write(LocalStorageKey.currentUser, getUser);
       getStorage.write(LocalStorageKey.currentUserUid, user.id);
       getStorage.write(LocalStorageKey.currentUserUsereName, userName.text);
-      UserContact? userContact = await BaseFirebaseServices.userContact(
+      UserContact? userContact = await FireStoreUtils.addUserContact(
         userContact: UserContact(
           optAddressOne: location.text.trim(),
           systemId: getStorage.read(LocalStorageKey.systemId),
@@ -104,7 +104,7 @@ class RegistrationScreenController extends GetxController {
   }
 
   void onError(PlacesAutocompleteResponse response) {
-    Get.snackbar('Error', response.errorMessage.toString());
+    FireStoreUtils.showError(title: 'Error', errorMessage: response.errorMessage.toString());
   }
 
   Future displayPrediction(Prediction? p) async {

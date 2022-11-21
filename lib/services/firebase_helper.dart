@@ -13,7 +13,6 @@ import 'package:swiftlink/common/constants/local_storage_key.dart';
 import 'package:swiftlink/models/service_model.dart';
 import 'package:swiftlink/models/user_contact.dart';
 import 'package:swiftlink/models/user_prefrence.dart';
-import 'package:swiftlink/services/base_firebase_services.dart';
 
 import '../models/user_model.dart';
 
@@ -32,7 +31,76 @@ class FireStoreUtils {
     debugPrint(getStorage.read(LocalStorageKey.systemId));
   }
 
-  static Future<Map<String, dynamic>> firebaseSubmitPhoneNumberCode({
+  static Future<User?> signUpUser({
+    required String email,
+    required String password,
+    required BuildContext context,
+  }) async {
+    try {
+      auth.UserCredential userCredential = await auth.FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+
+      await auth.FirebaseAuth.instance.currentUser!.updateEmail(email);
+
+      return User(
+        email: email,
+        id: userCredential.user?.uid ?? '',
+        systemId: getStorage.read(LocalStorageKey.systemId),
+      );
+    } on auth.FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showError(title: 'Error', errorMessage: 'Password Provided is too weak');
+        return null;
+      } else if (e.code == 'email-already-in-use') {
+        showError(title: 'Error', errorMessage: 'Email Provided already Exists');
+        return null;
+      } else {
+        showError(title: 'Error', errorMessage: 'Failed to create account');
+        return null;
+      }
+    } catch (e) {
+      showError(title: 'Error', errorMessage: e.toString());
+      return null;
+    }
+  }
+
+  static Future<User?> signInUser({required String email, required String password, required BuildContext context}) async {
+    try {
+      auth.UserCredential userCredential = await auth.FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      User? user = await FireStoreUtils.getCurrentUser(uid: userCredential.user?.uid ?? '');
+      if (user != null) {
+        return user;
+      } else {
+        showError(title: 'Error', errorMessage: 'Something went wrong');
+        return null;
+      }
+    } on auth.FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        showError(title: 'Error', errorMessage: 'No user Found with this Email');
+        return null;
+      } else if (e.code == 'wrong-password') {
+        showError(title: 'Error', errorMessage: 'Password did not match');
+        return null;
+      } else {
+        showError(title: 'Error', errorMessage: e.toString());
+        return null;
+      }
+    }
+  }
+
+  static Future<bool> resetPasswordLink({required String email, required BuildContext context}) async {
+    try {
+      await auth.FirebaseAuth.instance.sendPasswordResetEmail(
+        email: email,
+      );
+      showSuccess(title: 'Sent link', sucessMessage: 'Password reset link sent! check your email');
+      return true;
+    } on auth.FirebaseAuthException catch (e) {
+      showError(title: e.code, errorMessage: e.message.toString());
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> firebaseSubmitPhoneNumberCode({
     required String code,
     required String phoneNumber,
     String firstName = 'Anonymous',
@@ -44,7 +112,7 @@ class FireStoreUtils {
         smsCode: code,
       );
       auth.UserCredential userCredential = await auth.FirebaseAuth.instance.signInWithCredential(authCredential);
-      User? user = await BaseFirebaseServices.getCurrentUser(userId: userCredential.user?.uid ?? '');
+      User? user = await FireStoreUtils.getCurrentUser(uid: userCredential.user?.uid ?? '');
 
       if (user != null) {
         user.jwtToken = await firebaseMessaging.getToken() ?? '';
@@ -54,8 +122,6 @@ class FireStoreUtils {
             'user': user,
             'id': userCredential.user?.uid,
           },
-          'successMessage': null,
-          'errorMessage': null,
         };
       } else if (user == null) {
         return {
@@ -63,26 +129,18 @@ class FireStoreUtils {
             'statusCode': '200',
             'id': userCredential.user?.uid,
           },
-          'successMessage': null,
-          'errorMessage': null,
         };
       } else {
-        return {
-          'data': null,
-          'successMessage': null,
-          'errorMessage': 'Create new user with phone number.',
-        };
+        showError(title: 'Error', errorMessage: 'Create new user with phone number.');
+        return null;
       }
     } on auth.FirebaseAuthException catch (e) {
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': e.code,
-      };
+      showError(title: e.code, errorMessage: e.message.toString());
+      return null;
     }
   }
 
-  static Future<Map<String, dynamic>> checkIfUserNameAvailable(String userName) async {
+  static Future<bool> checkIfUserNameAvailable({required String userName}) async {
     QuerySnapshot<Map<String, dynamic>> userDocument = await firestore
         .collection(FirebaseTable.user)
         .where(
@@ -96,41 +154,30 @@ class FireStoreUtils {
         .get();
     debugPrint(userDocument.docs.isEmpty.toString() + ' USERNAME AVAILABLE');
     if (userDocument.docs.isEmpty) {
-      return {
-        'data': true,
-        'successMessage': null,
-        'errorMessage': null,
-      };
+      return true;
     } else {
-      return {
-        'data': false,
-        'successMessage': null,
-        'errorMessage': 'This user name already taken !!',
-      };
+      showError(
+        title: 'Error',
+        errorMessage: 'This user name already taken !!',
+      );
+      return false;
     }
   }
 
-  static Future<Map<String, dynamic>> createNewAccount(User user) async {
+  static Future<User?> createNewAccount({required User user}) async {
     try {
       return await firestore.collection(FirebaseTable.user).doc(user.id).set(user.toJson()).then((document) {
         debugPrint('User Created : ${user.id}');
-        return {
-          'data': user,
-          'successMessage': null,
-          'errorMessage': null,
-        };
+        return user;
       });
     } on auth.FirebaseException catch (e) {
       debugPrint('Error User Created : ${e.message}');
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': e.code,
-      };
+      showError(title: e.code, errorMessage: e.message.toString());
+      return null;
     }
   }
 
-  static Future<Map<String, dynamic>> getCurrentUser(String uid) async {
+  static Future<User?> getCurrentUser({required String uid}) async {
     try {
       QuerySnapshot<Map<String, dynamic>> userDocument = await firestore
           .collection(FirebaseTable.user)
@@ -146,49 +193,35 @@ class FireStoreUtils {
       List<User> users = userDocument.docs.map((doc) => User.fromJson(doc.data())).toList();
       if (users.isNotEmpty) {
         debugPrint('Current User  : ${users.first.id}');
-        return {
-          'data': users.first,
-          'successMessage': null,
-          'errorMessage': null,
-        };
+        return users.first;
       } else {
-        return {
-          'data': null,
-          'successMessage': null,
-          'errorMessage': null,
-        };
+        showError(
+          title: 'Error',
+          errorMessage: 'Some thing went wrong',
+        );
+        return null;
       }
     } on auth.FirebaseException catch (e) {
       debugPrint('Error Get Current User : ${e.message}');
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': e.message,
-      };
+      showError(title: 'Error', errorMessage: e.message.toString());
+      return null;
     }
   }
 
-  static Future<Map<String, dynamic>> addUserContact(UserContact userContact, String id) async {
+  static Future<UserContact?> addUserContact({required UserContact userContact, required String userId}) async {
     try {
-      return await firestore.collection(FirebaseTable.userContact).doc(id).set(userContact.toJson()).then((document) {
+      return await firestore.collection(FirebaseTable.userContact).doc(userId).set(userContact.toJson()).then((document) {
         debugPrint('Add User Contact : $userContact');
-        return {
-          'data': userContact,
-          'successMessage': null,
-          'errorMessage': null,
-        };
+        return userContact;
       });
     } on auth.FirebaseException catch (e) {
       debugPrint('Error Add User Contact : ${e.message}');
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': e.message,
-      };
+      showError(title: 'Error', errorMessage: e.message.toString());
+      return null;
     }
   }
 
-  static Future<Map<String, dynamic>> getService(String systemId) async {
+  static Future<List<ServiceModel>> getService(String systemId) async {
     try {
       QuerySnapshot serviceCollection = await firestore
           .collection(FirebaseTable.service)
@@ -197,22 +230,15 @@ class FireStoreUtils {
             isEqualTo: systemId,
           )
           .get();
-      return {
-        'data': serviceCollection.docs.map((doc) => ServiceModel.fromJson(doc.data() as Map<String, dynamic>)).toList(),
-        'successMessage': null,
-        'errorMessage': null,
-      };
+      return serviceCollection.docs.map((doc) => ServiceModel.fromJson(doc.data() as Map<String, dynamic>)).toList();
     } on auth.FirebaseException catch (e) {
       debugPrint('Error Get Service : ${e.message}');
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': e.message,
-      };
+      showError(title: 'Error', errorMessage: e.message.toString());
+      return [];
     }
   }
 
-  static Future<Map<String, dynamic>> getSelectedService(String userName) async {
+  static Future<UserPrefrence?> getSelectedService(String userName) async {
     try {
       QuerySnapshot userPrefrence = await firestore
           .collection(FirebaseTable.userPreferences)
@@ -226,48 +252,34 @@ class FireStoreUtils {
           )
           .get();
       List<UserPrefrence> userPrefrenceList = userPrefrence.docs.map((doc) => UserPrefrence.fromJson(doc.data() as Map<String, dynamic>)).toList();
-      return {
-        'data': userPrefrenceList.isNotEmpty
-            ? userPrefrenceList.first
-            : UserPrefrence(
-                serviceCategory: null,
-                systemId: null,
-                userName: null,
-              ),
-        'successMessage': null,
-        'errorMessage': null,
-      };
+      return userPrefrenceList.isNotEmpty
+          ? userPrefrenceList.first
+          : UserPrefrence(
+              serviceCategory: null,
+              systemId: null,
+              userName: null,
+            );
     } on auth.FirebaseException catch (e) {
       debugPrint('Error Get Service : ${e.message}');
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': e.message,
-      };
+      showError(title: 'Error', errorMessage: e.message.toString());
+      return null;
     }
   }
 
-  static Future<Map<String, dynamic>> setServiceList(UserPrefrence userPrefrence, String userId) async {
+  static Future<UserPrefrence?> setServiceList(UserPrefrence userPrefrence, String userId) async {
     try {
       return await firestore.collection(FirebaseTable.userPreferences).doc(userId).set(userPrefrence.toJson()).then((document) {
         debugPrint('Add User Prefrence : $userPrefrence');
-        return {
-          'data': userPrefrence,
-          'successMessage': null,
-          'errorMessage': null,
-        };
+        return userPrefrence;
       });
     } on auth.FirebaseException catch (e) {
       debugPrint('Error Add User Prefrence : ${e.message}');
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': e.message,
-      };
+      showError(title: 'Error', errorMessage: e.message.toString());
+      return null;
     }
   }
 
-  static Future<Map<String, dynamic>> ifServiceAdded(String userName) async {
+  static Future<bool> ifServiceAdded(String userName) async {
     QuerySnapshot<Map<String, dynamic>> userDocument = await firestore
         .collection(FirebaseTable.userPreferences)
         .where(
@@ -281,40 +293,25 @@ class FireStoreUtils {
         .get();
     debugPrint(userDocument.docs.isEmpty.toString() + 'Service Not Added');
     if (userDocument.docs.isEmpty) {
-      return {
-        'data': true,
-        'successMessage': null,
-        'errorMessage': null,
-      };
+      return true;
     } else {
-      return {
-        'data': false,
-        'successMessage': null,
-        'errorMessage': null,
-      };
+      return false;
     }
   }
 
-  static Future<Map<String, dynamic>> signOut() async {
+  static Future<bool> signOut() async {
     try {
       await auth.FirebaseAuth.instance.signOut();
       getStorage.erase();
-      return {
-        'data': true,
-        'successMessage': null,
-        'errorMessage': null,
-      };
+      return true;
     } on auth.FirebaseAuthException catch (e) {
       debugPrint('Error Add User Prefrence : ${e.message}');
-      return {
-        'data': false,
-        'successMessage': null,
-        'errorMessage': e.message,
-      };
+      showError(title: 'title', errorMessage: e.message.toString());
+      return false;
     }
   }
 
-  static Future<Map<String, dynamic>> loginWithFacebook() async {
+  static Future<User?> loginWithFacebook() async {
     FacebookAuth facebookAuth = FacebookAuth.instance;
     bool isLogged = await facebookAuth.accessToken != null;
     if (!isLogged) {
@@ -331,11 +328,8 @@ class FireStoreUtils {
         AccessToken? token = await facebookAuth.accessToken;
         return await handleFacebookLogin(await facebookAuth.getUserData(), token!);
       } else {
-        return {
-          'data': null,
-          'successMessage': null,
-          'errorMessage': 'Facebook authentication failed, Please try again',
-        };
+        showError(title: 'Error', errorMessage: 'Facebook authentication failed, Please try again');
+        return null;
       }
     } else {
       AccessToken? token = await facebookAuth.accessToken;
@@ -343,20 +337,16 @@ class FireStoreUtils {
     }
   }
 
-  static Future<Map<String, dynamic>> handleFacebookLogin(Map<String, dynamic> userData, AccessToken token) async {
+  static Future<User?> handleFacebookLogin(Map<String, dynamic> userData, AccessToken token) async {
     try {
       auth.UserCredential authResult = await auth.FirebaseAuth.instance.signInWithCredential(auth.FacebookAuthProvider.credential(token.token));
-      User? user = await BaseFirebaseServices.getCurrentUser(userId: authResult.user?.uid ?? '');
+      User? user = await FireStoreUtils.getCurrentUser(uid: authResult.user?.uid ?? '');
 
       if (user != null) {
         user.jwtToken = await firebaseMessaging.getToken();
         user.picture = authResult.user?.photoURL;
         user.systemId = getStorage.read(LocalStorageKey.systemId);
-        return {
-          'data': user,
-          'successMessage': null,
-          'errorMessage': null,
-        };
+        return user;
       } else {
         user = User(
           id: authResult.user?.uid,
@@ -365,31 +355,25 @@ class FireStoreUtils {
           systemId: getStorage.read(LocalStorageKey.systemId),
           jwtToken: await firebaseMessaging.getToken(),
         );
-        User? result = await BaseFirebaseServices.createNewUser(user: user);
+        User? result = await FireStoreUtils.createNewAccount(user: user);
         if (result != null) {
-          return {
-            'data': user,
-            'successMessage': null,
-            'errorMessage': null,
-          };
+          return user;
         } else {
-          return {
-            'data': null,
-            'successMessage': null,
-            'errorMessage': 'Facebook authentication failed, Please try again',
-          };
+          showError(title: 'Error', errorMessage: 'Facebook authentication failed, Please try again');
+          return null;
         }
       }
+    } on auth.FirebaseAuthException catch (e) {
+      debugPrint('Error Add User Prefrence : ${e.message}');
+      showError(title: e.code, errorMessage: e.message.toString());
+      return null;
     } catch (e) {
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': 'Facebook authentication failed, Please try again',
-      };
+      showError(title: 'Error', errorMessage: 'Facebook authentication failed, Please try again');
+      return null;
     }
   }
 
-  static Future<Map<String, dynamic>> loginWithGoogle() async {
+  static Future<User?> loginWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
@@ -398,16 +382,12 @@ class FireStoreUtils {
         idToken: googleAuth?.idToken,
       );
       auth.UserCredential authResult = await auth.FirebaseAuth.instance.signInWithCredential(credential);
-      User? user = await BaseFirebaseServices.getCurrentUser(userId: authResult.user?.uid ?? '');
+      User? user = await FireStoreUtils.getCurrentUser(uid: authResult.user?.uid ?? '');
       if (user != null) {
         user.jwtToken = await firebaseMessaging.getToken();
         user.picture = authResult.user?.photoURL;
         user.systemId = getStorage.read(LocalStorageKey.systemId);
-        return {
-          'data': user,
-          'successMessage': null,
-          'errorMessage': null,
-        };
+        return user;
       } else {
         String? jwtToken = await firebaseMessaging.getToken();
         user = User(
@@ -417,33 +397,20 @@ class FireStoreUtils {
           systemId: getStorage.read(LocalStorageKey.systemId),
           jwtToken: jwtToken,
         );
-        User? result = await BaseFirebaseServices.createNewUser(user: user);
+        User? result = await FireStoreUtils.createNewAccount(user: user);
         if (result != null) {
-          return {
-            'data': result,
-            'successMessage': null,
-            'errorMessage': null,
-          };
+          return result;
         } else {
-          return {
-            'data': null,
-            'successMessage': null,
-            'errorMessage': 'Google authentication failed, Please try again',
-          };
+          showError(title: 'Error', errorMessage: 'Google authentication failed, Please try again');
+          return null;
         }
       }
-    } on auth.FirebaseAuthException catch (_) {
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': _.message,
-      };
+    } on auth.FirebaseAuthException catch (e) {
+      showError(title: e.code, errorMessage: e.message.toString());
+      return null;
     } catch (e) {
-      return {
-        'data': null,
-        'successMessage': null,
-        'errorMessage': 'Google authentication failed, Please try again',
-      };
+      showError(title: 'Error', errorMessage: 'Google authentication failed, Please try again');
+      return null;
     }
   }
 
@@ -473,7 +440,7 @@ class FireStoreUtils {
       },
       (auth.PhoneAuthCredential credential) async {
         auth.UserCredential userCredential = await auth.FirebaseAuth.instance.signInWithCredential(credential);
-        User? user = await BaseFirebaseServices.getCurrentUser(userId: userCredential.user?.uid ?? '');
+        User? user = await FireStoreUtils.getCurrentUser(uid: userCredential.user?.uid ?? '');
         if (user != null) {
           log(user.firstName.toString());
         } else {}
@@ -496,5 +463,49 @@ class FireStoreUtils {
       codeSent: phoneCodeSent!,
       codeAutoRetrievalTimeout: phoneCodeAutoRetrievalTimeout!,
     );
+  }
+
+  static void showSuccess({
+    required String title,
+    required String sucessMessage,
+  }) {
+    Get.snackbar(
+      title,
+      sucessMessage,
+      margin: const EdgeInsets.all(15),
+      backgroundColor: Colors.greenAccent.withOpacity(0.5),
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  static void showError({
+    required String title,
+    required String errorMessage,
+  }) {
+    Get.snackbar(
+      title,
+      errorMessage,
+      backgroundColor: Colors.redAccent.withOpacity(0.5),
+      margin: const EdgeInsets.all(15),
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  static String getErrorMessage(String exceptionCode) {
+    switch (exceptionCode) {
+      case 'invalid-email':
+        return 'Email address is malformed.';
+      case 'invalid-verification-code':
+        return 'Invalid verification code';
+      case 'wrong-password':
+        return 'Wrong password.';
+      case 'user-not-found':
+        return 'No user corresponding to the given email address.';
+      case 'user-disabled':
+        return 'This user has been disabled.';
+      case 'too-many-requests':
+        return 'Too many attempts to sign in as this user.';
+    }
+    return 'Unexpected firebase error, Please try again.';
   }
 }

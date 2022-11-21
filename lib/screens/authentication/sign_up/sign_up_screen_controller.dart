@@ -3,45 +3,42 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:swiftlink/common/constants/local_storage_key.dart';
 import 'package:swiftlink/models/user_model.dart';
-import 'package:swiftlink/screens/authentication/otp_verify/otp_verify_screen.dart';
-import 'package:swiftlink/screens/authentication/otp_verify/otp_verify_screen_binding.dart';
 import 'package:swiftlink/screens/authentication/registration/registration_screen.dart';
 import 'package:swiftlink/screens/authentication/registration/registration_screen_binding.dart';
 import 'package:swiftlink/screens/preference/preference.dart';
 import 'package:swiftlink/screens/preference/preference_screen_binding.dart';
-import 'package:swiftlink/services/base_firebase_services.dart';
 import 'package:swiftlink/services/firebase_helper.dart';
 
-class AuthController extends GetxController {
+class SignUpScreenController extends GetxController {
   User user = User();
-
-  final TextEditingController phoneNumber = TextEditingController();
   GetStorage getStorage = GetStorage();
 
-  @override
-  void dispose() {
-    phoneNumber.dispose();
-    super.dispose();
-  }
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final TextEditingController confirmPassword = TextEditingController();
 
-  Future<void> signupWithMobileNumber() async {
-    user.phoneNumber = phoneNumber.text;
-    await FireStoreUtils.signupWithMobileNumber(phoneNumber: phoneNumber.text);
-    Get.to(
-      () => const VerifyCode(),
-      binding: OtpVerifyScreenBinding(user: user),
-    );
+  Future<void> signupWithEmailPassword(BuildContext context) async {
+    if (password.text == confirmPassword.text) {
+      User? user = await FireStoreUtils.signUpUser(
+        context: context,
+        email: email.text.trim(),
+        password: password.text.trim(),
+      );
+      if (user != null) {
+        handleUser(user);
+      }
+    }
   }
 
   Future<void> signupWithFacebook() async {
-    User? user = await BaseFirebaseServices.signUpOrInWithFacebook();
+    User? user = await FireStoreUtils.loginWithFacebook();
     if (user != null) {
       handleUser(user);
     }
   }
 
   Future<void> signupWithGoogle() async {
-    User? user = await BaseFirebaseServices.signUpOrInWithGoogle();
+    User? user = await FireStoreUtils.loginWithFacebook();
     if (user != null) {
       handleUser(user);
     }

@@ -6,11 +6,11 @@ import 'package:get/get.dart';
 import 'package:swiftlink/common/constants/app_asset.dart';
 import 'package:swiftlink/common/theme/theme.dart';
 import 'package:swiftlink/common/utils/colors.dart';
-import 'package:swiftlink/screens/authentication/controller/auth_controller.dart';
 import 'package:swiftlink/screens/authentication/sign_in/sign_in_screen.dart';
+import 'package:swiftlink/screens/authentication/sign_up/sign_up_screen_controller.dart';
 import 'package:swiftlink/services/validators.dart';
 
-class SignUpScreen extends GetView<AuthController> {
+class SignUpScreen extends GetView<SignUpScreenController> {
   SignUpScreen({Key? key}) : super(key: key);
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -26,155 +26,155 @@ class SignUpScreen extends GetView<AuthController> {
               fit: BoxFit.cover,
             ),
           ),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Image.asset(
-                    AppAsset.appLogo,
-                  ),
-                  const SizedBox(height: 30),
-                  Text(
-                    'Create account',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  const SizedBox(height: 20),
-                  Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: controller.phoneNumber,
-                          validator: (String? value) => Validators.validatePhoneNumber(value),
-                          decoration: const InputDecoration(
-                            hintText: 'Mobile Number',
-                            helperText: '',
-                            isDense: true,
-                            prefixIcon: Align(
-                                widthFactor: 2.5,
-                                heightFactor: 1,
-                                child: Icon(
-                                  Icons.phone,
-                                  size: 20,
-                                  color: Color(0xffFB9A08),
-                                )),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const SizedBox(
+                  height: 270,
+                ),
+                Image.asset(
+                  AppAsset.appLogo,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Create account',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                const SizedBox(height: 20),
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: controller.email,
+                        validator: (String? value) => Validators.validateEmail(value),
+                        decoration: const InputDecoration(
+                          hintText: 'Enter email',
+                          helperText: '',
+                          isDense: true,
+                          prefixIcon: Align(
+                              widthFactor: 2.5,
+                              heightFactor: 1,
+                              child: Icon(
+                                Icons.email_outlined,
+                                size: 20,
+                                color: Color(0xffFB9A08),
+                              )),
+                        ),
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        controller: controller.password,
+                        validator: (String? value) => Validators.validatePassword(value),
+                        decoration: InputDecoration(
+                          hintText: 'Password',
+                          helperText: '',
+                          isDense: true,
+                          prefixIcon: Align(
+                            widthFactor: 3.2,
+                            heightFactor: 1,
+                            child: Image.asset(
+                              AppAsset.lockIcon,
+                              scale: 2,
+                            ),
                           ),
                         ),
-                        // TextFormField(
-                        //   obscureText: true,
-                        //   controller: controller.password,
-                        //   validator: (String? value) => Validators.validatePassword(value),
-                        //   decoration: InputDecoration(
-                        //     hintText: 'Password',
-                        //     helperText: '',
-                        //     isDense: true,
-                        //     prefixIcon: Align(
-                        //       widthFactor: 3.2,
-                        //       heightFactor: 1,
-                        //       child: Image.asset(
-                        //         AppAsset.lockIcon,
-                        //         scale: 2,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        // TextFormField(
-                        //   obscureText: true,
-                        //   controller: controller.confirmPassword,
-                        //   validator: (String? value) => Validators.validateConfirmPassword(
-                        //     value,
-                        //     password: controller.password.text,
-                        //   ),
-                        //   decoration: InputDecoration(
-                        //     hintText: 'Confirm Password',
-                        //     helperText: '',
-                        //     isDense: true,
-                        //     prefixIcon: Align(
-                        //       widthFactor: 3.2,
-                        //       heightFactor: 1,
-                        //       child: Image.asset(
-                        //         AppAsset.lockIcon,
-                        //         scale: 2,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        // const SizedBox(
-                        //   height: 40,
-                        // ),
-                        TextButton(
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              controller.signupWithMobileNumber();
-                            }
-                          },
-                          style: TextButton.styleFrom(
-                            minimumSize: const Size.fromHeight(50),
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        controller: controller.confirmPassword,
+                        validator: (String? value) => Validators.validateConfirmPassword(
+                          value,
+                          password: controller.password.text,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Confirm Password',
+                          helperText: '',
+                          isDense: true,
+                          prefixIcon: Align(
+                            widthFactor: 3.2,
+                            heightFactor: 1,
+                            child: Image.asset(
+                              AppAsset.lockIcon,
+                              scale: 2,
+                            ),
                           ),
-                          child: const Text('Next'),
                         ),
-                        const SizedBox(
-                          height: 20,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            controller.signupWithEmailPassword(context);
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size.fromHeight(50),
                         ),
-                        const Text(
-                          'or sign up with your social media',
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        child: const Text('Next'),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'or sign up with your social media',
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          authButtons(
+                            imagePath: 'assets/images/google.png',
+                            function: () async {
+                              controller.signupWithGoogle();
+                            },
+                          ),
+                          authButtons(
+                            imagePath: 'assets/images/facebook.png',
+                            function: () async {
+                              await controller.signupWithFacebook();
+                            },
+                          ),
+                          if (Platform.isIOS)
+                            authButtons(
+                              imagePath: 'assets/images/apple.png',
+                              function: () {},
+                            ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text.rich(
+                        TextSpan(
+                          text: 'Already have an account? ',
                           children: [
-                            authButtons(
-                              imagePath: 'assets/images/google.png',
-                              function: () async {
-                                controller.signupWithGoogle();
-                              },
+                            TextSpan(
+                              text: 'Sign In',
+                              style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(
+                                    () => SignInScreen(),
+                                  );
+                                },
                             ),
-                            authButtons(
-                              imagePath: 'assets/images/facebook.png',
-                              function: () async {
-                                await controller.signupWithFacebook();
-                              },
-                            ),
-                            if (Platform.isIOS)
-                              authButtons(
-                                imagePath: 'assets/images/apple.png',
-                                function: () {},
-                              ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            text: 'Already have an account? ',
-                            children: [
-                              TextSpan(
-                                text: 'Sign In',
-                                style: TextStyle(color: Constants.blue, fontWeight: FontWeight.bold, fontSize: 13),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Get.to(
-                                      () => SignInScreen(),
-                                    );
-                                  },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ),
