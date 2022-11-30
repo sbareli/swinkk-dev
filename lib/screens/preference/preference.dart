@@ -26,7 +26,6 @@ class PreferenceScreen extends GetView<PreferenceScreenController> {
                   "Tell us what you’re into",
                   style: Theme.of(context).textTheme.headline6,
                 ),
-                // const SizedBox(height: 300),
                 SizedBox(
                   height: 300,
                   child: SingleChildScrollView(
@@ -34,7 +33,7 @@ class PreferenceScreen extends GetView<PreferenceScreenController> {
                     child: GetBuilder<PreferenceScreenController>(
                       builder: (_) => HexagonOffsetGrid.oddPointy(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
-                        columns: (controller.servicesList.length / 3).round() + 3,
+                        columns: (controller.servicesList.length / 3).round() + 4,
                         rows: 3,
                         buildTile: (col, row) {
                           bool validRange;
@@ -45,14 +44,14 @@ class PreferenceScreen extends GetView<PreferenceScreenController> {
                           }
                           return HexagonWidgetBuilder(
                             elevation: validRange
-                                ? controller.selectedServices.contains(controller.servicesList[row + col].serviceCategory)
+                                ? controller.selectedServices.contains(controller.servicesList[(controller.servicesList.length - 1) - (row + col * 3)].serviceCategory)
                                     ? 0
                                     : 5
                                 : 5,
                             padding: 3.0,
                             cornerRadius: 8.0,
                             color: validRange
-                                ? controller.selectedServices.contains(controller.servicesList[row + col].serviceCategory)
+                                ? controller.selectedServices.contains(controller.servicesList[(controller.servicesList.length - 1) - (row + col * 3)].serviceCategory)
                                     ? Colors.green.shade200
                                     : backgroundGrey
                                 : Constants.grey08,
@@ -60,14 +59,12 @@ class PreferenceScreen extends GetView<PreferenceScreenController> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: validRange
-                                    ? Obx(
-                                        () => Text(
-                                          controller.servicesList[row + col].serviceCategory!,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: controller.selectedServices.contains(controller.servicesList[row + col].serviceCategory) ? textBlack : textGrey,
-                                          ),
+                                    ? Text(
+                                        controller.servicesList[(controller.servicesList.length - 1) - (row + col * 3)].serviceCategory!,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: controller.selectedServices.contains(controller.servicesList[(controller.servicesList.length - 1) - (row + col * 3)].serviceCategory) ? textBlack : textGrey,
                                         ),
                                       )
                                     : const Text(
@@ -79,7 +76,7 @@ class PreferenceScreen extends GetView<PreferenceScreenController> {
                                       ),
                               ),
                               onTap: () {
-                                controller.selectService(validRange, row + col);
+                                controller.selectService(validRange, (controller.servicesList.length - 1) - (row + col * 3));
                               },
                             ),
                           );

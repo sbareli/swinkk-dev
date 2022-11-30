@@ -229,6 +229,7 @@ class FireStoreUtils {
             'system_id',
             isEqualTo: systemId,
           )
+          .orderBy('rank', descending: true)
           .get();
       return serviceCollection.docs.map((doc) => ServiceModel.fromJson(doc.data() as Map<String, dynamic>)).toList();
     } on auth.FirebaseException catch (e) {
