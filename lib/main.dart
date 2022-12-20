@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:swiftlink/app.dart';
 
+/*
+  bsb: testing under HEAD:new-main with branch refactor-phase-1
+*/
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
