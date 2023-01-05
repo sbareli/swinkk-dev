@@ -21,6 +21,9 @@ class RegistrationScreenController extends GetxController {
   TextEditingController firstName = TextEditingController();
   TextEditingController lastName = TextEditingController();
   TextEditingController location = TextEditingController();
+  TextEditingController country = TextEditingController();
+  TextEditingController postalCode = TextEditingController();
+  TextEditingController administrativeAreaLevel1 = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final kGoogleApiKey = "AIzaSyAOt_IitFgSXD5oc1o6RJntfr0ypZtOfzQ";
   int searchSkipCount = 0;
@@ -43,6 +46,9 @@ class RegistrationScreenController extends GetxController {
             currentLocaiton.longitude,
           );
           location.text = placemarks[0].locality.toString();
+          country.text = placemarks[0].country.toString();
+          postalCode.text = placemarks[0].postalCode.toString();
+          administrativeAreaLevel1.text = placemarks[0].administrativeArea.toString();
         } else {
           Get.to(
             () => const NoLocationScreen(),
@@ -67,6 +73,9 @@ class RegistrationScreenController extends GetxController {
       UserContact? userContact = await FireStoreUtils.addUserContact(
         userContact: UserContact(
           optAddressOne: location.text.trim(),
+          administrativeAreaLevel1: administrativeAreaLevel1.text.trim(),
+          postalCode: postalCode.text.trim(),
+          country: country.text.trim(),
           systemId: getStorage.read(LocalStorageKey.systemId),
           userName: userName.text.trim(),
         ),
@@ -115,6 +124,15 @@ class RegistrationScreenController extends GetxController {
       );
       PlacesDetailsResponse details = await _places.getDetailsByPlaceId(p.placeId ?? '000');
       location.text = details.result.name.toString();
+      for (var element in details.result.addressComponents) {
+        if (element.types.contains('country')) {
+          country.text = element.longName;
+        } else if (element.types.contains('postal_code')) {
+          postalCode.text = element.longName;
+        } else if (element.types.contains('administrative_area_level_1')) {
+          administrativeAreaLevel1.text = element.longName;
+        }
+      }
     } else {
       searchData.value = 'Search';
     }
